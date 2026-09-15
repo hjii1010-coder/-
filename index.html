@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>🌸중국어회화 단어 매칭 애니팡 게임🐼</title>
+  <title>🌸 중국어회화 단어 매칭 애니팡 게임 🐾</title>
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
@@ -11,7 +11,7 @@
     
     body {
       font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-      background: linear-gradient(135deg, #FFE5EC 0%, #F0E6FF 50%, #E8F5E9 100%);
+      background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
       color: #4A4A4A;
       margin: 0;
       padding: 16px;
@@ -20,6 +20,19 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 둥둥 떠다니는 귀여운 애니메이션 */
+    @keyframes floatMascot {
+      0%, 100% { transform: translateY(0px) rotate(-3deg); }
+      50% { transform: translateY(-6px) rotate(3deg); }
+    }
+
+    @keyframes popMatch {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(0); }
     }
 
     .game-container {
@@ -28,24 +41,36 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
     }
+
+    /* 상단 장식 스티커 */
+    .decor-sticker {
+      position: absolute;
+      top: -25px;
+      font-size: 26px;
+      animation: floatMascot 2.5s infinite ease-in-out;
+      z-index: 5;
+    }
+    .sticker-left { left: 10px; }
+    .sticker-right { right: 10px; animation-delay: 1.2s; }
 
     /* 상단 유저 정보 바 */
     .user-badge {
       width: 100%;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(8px);
-      padding: 8px 16px;
-      border-radius: 20px;
+      padding: 10px 18px;
+      border-radius: 24px;
       font-size: 14px;
-      font-weight: 700;
-      color: #7C3AED;
+      font-weight: 800;
+      color: #8B5CF6;
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
-      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.08);
-      border: 2px solid #F3E8FF;
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.12);
+      border: 3px solid #FFF;
     }
 
     .header {
@@ -54,35 +79,39 @@
       justify-content: space-between;
       align-items: center;
       background: #FFFFFF;
-      padding: 12px 20px;
-      border-radius: 20px;
+      padding: 12px 22px;
+      border-radius: 24px;
       margin-bottom: 12px;
-      box-shadow: 0 8px 20px rgba(255, 182, 193, 0.2);
-      border: 2px solid #FFF0F5;
+      box-shadow: 0 8px 24px rgba(255, 182, 193, 0.3);
+      border: 3px solid #FFF0F5;
     }
     .stat-box { text-align: center; }
-    .stat-title { font-size: 12px; color: #8E8E93; margin-bottom: 2px; font-weight: 600; }
-    .stat-value { font-size: 22px; font-weight: 800; color: #FF6B81; }
+    .stat-title { font-size: 12px; color: #94A3B8; margin-bottom: 2px; font-weight: 700; }
+    .stat-value { font-size: 22px; font-weight: 900; color: #FF6B81; }
 
-    /* 단어 표시 카드 */
+    /* 단어 표시 카드 배너 */
     .card-banner {
       width: 100%;
-      height: 72px;
+      height: 76px;
       background: #FFFFFF;
-      border-radius: 20px;
+      border-radius: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
       margin-bottom: 14px;
       border: 3px solid #FFD1DC;
-      box-shadow: 0 8px 20px rgba(255, 209, 220, 0.3);
-      padding: 0 12px;
+      box-shadow: 0 8px 20px rgba(255, 209, 220, 0.4);
+      padding: 0 16px;
+      position: relative;
     }
-    .banner-mascot { font-size: 28px; }
+    .banner-mascot {
+      font-size: 34px;
+      animation: floatMascot 2s infinite ease-in-out;
+    }
     .banner-content { text-align: left; }
-    .banner-hanzi { font-size: 20px; font-weight: 800; color: #6C5CE7; }
-    .banner-sub { font-size: 13px; color: #FF7675; font-weight: 700; }
+    .banner-hanzi { font-size: 20px; font-weight: 900; color: #7C3AED; }
+    .banner-sub { font-size: 13px; color: #FF6B81; font-weight: 800; }
 
     /* 게임 그리드 판 */
     .grid-board {
@@ -90,51 +119,54 @@
       aspect-ratio: 1;
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 7px;
-      background: rgba(255, 255, 255, 0.7);
-      padding: 10px;
-      border-radius: 24px;
-      border: 3px solid #FFF;
-      box-shadow: 0 12px 30px rgba(160, 108, 213, 0.15);
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.75);
+      padding: 12px;
+      border-radius: 28px;
+      border: 4px solid #FFF;
+      box-shadow: 0 14px 35px rgba(160, 108, 213, 0.18);
     }
 
+    /* 입체감 있는 말랑말랑 파스텔 타일 */
     .tile {
-      border-radius: 16px;
+      border-radius: 18px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.2s;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), inset 0 -3px 0 rgba(0,0,0,0.1);
-      color: #333333;
-      padding: 2px;
+      transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+      box-shadow: 0 6px 0 rgba(0, 0, 0, 0.06), inset 0 3px 0 rgba(255, 255, 255, 0.6);
+      color: #2D3748;
+      padding: 3px;
       text-align: center;
       word-break: keep-all;
+      position: relative;
     }
-    .tile:active { transform: scale(0.92); }
+    .tile:active {
+      transform: scale(0.92);
+    }
     .tile.selected {
       outline: 4px solid #FF6B81;
-      transform: scale(1.08);
+      transform: scale(1.1) rotate(2deg);
       z-index: 10;
-      box-shadow: 0 0 18px rgba(255, 107, 129, 0.5);
+      box-shadow: 0 0 20px rgba(255, 107, 129, 0.6);
     }
     
-    /* 한자/병음 타일 스타일 */
-    .tile-hanzi { font-size: 15px; font-weight: 800; line-height: 1.1; margin-bottom: 2px; color: #2D3748; }
-    .tile-pinyin { font-size: 9px; opacity: 0.85; font-weight: 600; color: #4A5568; }
+    /* 타일 텍스트 스타일 */
+    .tile-hanzi { font-size: 15px; font-weight: 900; line-height: 1.1; margin-bottom: 2px; color: #1E293B; }
+    .tile-pinyin { font-size: 9px; opacity: 0.8; font-weight: 700; color: #475569; }
+    
+    /* 뜻 타일: 요청에 따라 '💡뜻' 제거하고 깔끔한 폰트 적용 */
+    .tile-meaning { font-size: 12px; font-weight: 800; line-height: 1.25; color: #4C1D95; padding: 0 2px; }
 
-    /* 뜻 타일 스타일 */
-    .tile-meaning { font-size: 12px; font-weight: 800; line-height: 1.2; color: #5B21B6; }
-    .tile-tag { font-size: 8px; opacity: 0.7; margin-top: 2px; font-weight: 600; color: #7C3AED; }
-
-    /* 모달 */
+    /* 모달 디자인 */
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(108, 92, 231, 0.3);
-      backdrop-filter: blur(6px);
+      background: rgba(139, 92, 246, 0.25);
+      backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -146,34 +178,34 @@
     .modal.show { opacity: 1; pointer-events: auto; }
     .modal-box {
       background: #FFFFFF;
-      padding: 28px 24px;
-      border-radius: 28px;
+      padding: 30px 24px;
+      border-radius: 32px;
       text-align: center;
       width: 90%;
       max-width: 380px;
       border: 4px solid #FFD1DC;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
       max-height: 85vh;
       overflow-y: auto;
     }
 
-    .modal-title { font-size: 24px; font-weight: 800; color: #6C5CE7; margin-bottom: 16px; }
+    .modal-title { font-size: 24px; font-weight: 900; color: #7C3AED; margin-bottom: 16px; }
     
     .input-group { margin-bottom: 14px; text-align: left; }
-    .input-label { font-size: 13px; font-weight: 700; color: #8E8E93; margin-bottom: 6px; display: block; }
+    .input-label { font-size: 13px; font-weight: 800; color: #64748B; margin-bottom: 6px; display: block; }
     .custom-input, .custom-select {
       width: 100%;
-      padding: 12px 14px;
+      padding: 12px 16px;
       font-size: 15px;
       font-weight: 700;
-      border: 2px solid #E8E8E8;
-      border-radius: 14px;
+      border: 2px solid #F1F5F9;
+      border-radius: 16px;
       outline: none;
-      background: #FAFAFA;
-      color: #4A4A4A;
+      background: #F8FAFC;
+      color: #334155;
     }
     .custom-input:focus, .custom-select:focus {
-      border-color: #A29BFE;
+      border-color: #C084FC;
       background: #FFF;
     }
 
@@ -181,16 +213,17 @@
       background: linear-gradient(135deg, #FF7675 0%, #FF6B81 100%);
       color: white;
       border: none;
-      padding: 14px;
+      padding: 15px;
       font-size: 16px;
-      font-weight: 800;
-      border-radius: 16px;
+      font-weight: 900;
+      border-radius: 20px;
       cursor: pointer;
       width: 100%;
-      box-shadow: 0 6px 15px rgba(255, 107, 129, 0.3);
-      margin-top: 8px;
+      box-shadow: 0 8px 18px rgba(255, 107, 129, 0.35);
+      margin-top: 10px;
+      transition: transform 0.1s;
     }
-    .btn-main:active { transform: scale(0.97); }
+    .btn-main:active { transform: scale(0.96); }
 
     .btn-secondary {
       background: #F3E8FF;
@@ -198,8 +231,8 @@
       border: none;
       padding: 12px;
       font-size: 14px;
-      font-weight: 700;
-      border-radius: 14px;
+      font-weight: 800;
+      border-radius: 16px;
       cursor: pointer;
       width: 100%;
       margin-top: 8px;
@@ -211,17 +244,20 @@
       margin-top: 10px;
       font-size: 13px;
     }
-    .rank-table th { background: #F3E8FF; color: #7C3AED; padding: 8px; border-radius: 6px; }
-    .rank-table td { padding: 8px; border-bottom: 1px solid #F0F0F0; text-align: center; }
-    .rank-badge { font-weight: 800; color: #FF6B81; }
+    .rank-table th { background: #F3E8FF; color: #7C3AED; padding: 10px; border-radius: 8px; }
+    .rank-table td { padding: 8px; border-bottom: 1px solid #F1F5F9; text-align: center; }
+    .rank-badge { font-weight: 900; color: #FF6B81; }
   </style>
 </head>
 <body>
 
   <div class="game-container">
+    <div class="decor-sticker sticker-left">🌸</div>
+    <div class="decor-sticker sticker-right">🎀</div>
+
     <div class="user-badge">
       <span id="displayUserInfo">👤 학생 정보 미입력</span>
-      <button onclick="openStartModal()" style="border:none; background:none; color:#7C3AED; font-weight:700; cursor:pointer; font-size:12px;">⚙️ 변경</button>
+      <button onclick="openStartModal()" style="border:none; background:none; color:#7C3AED; font-weight:800; cursor:pointer; font-size:12px;">⚙️ 변경</button>
     </div>
 
     <div class="header">
@@ -236,10 +272,10 @@
     </div>
 
     <div class="card-banner">
-      <div class="banner-mascot" id="bannerMascot">🐼</div>
+      <div class="banner-mascot" id="bannerMascot">🐻‍❄️</div>
       <div class="banner-content">
         <div id="bannerHanzi" class="banner-hanzi">한자&뜻 짝맞추기</div>
-        <div id="bannerSub" class="banner-sub">한자/병음과 뜻을 맞춰 3개를 완성하세요!</div>
+        <div id="bannerSub" class="banner-sub">한자와 뜻을 맞춰 3개를 연속 연결하세요!</div>
       </div>
     </div>
 
@@ -249,8 +285,8 @@
   <!-- 시작 모달 -->
   <div id="startModal" class="modal show">
     <div class="modal-box">
-      <div style="font-size: 40px; margin-bottom: 8px;">🎀</div>
-      <div class="modal-title">중국어 단어&뜻 애니팡</div>
+      <div style="font-size: 44px; margin-bottom: 6px; animation: floatMascot 2s infinite ease-in-out;">🐥</div>
+      <div class="modal-title">중국어 팡팡! 짝맞추기</div>
       
       <div class="input-group">
         <label class="input-label">학번 (예: 10101)</label>
@@ -283,13 +319,13 @@
   <!-- 게임 종료 모달 -->
   <div id="gameOverModal" class="modal">
     <div class="modal-box">
-      <div style="font-size: 48px; margin-bottom: 8px;">🎉</div>
-      <div class="modal-title">수고하셨습니다!</div>
-      <div id="finalScore" style="font-size: 20px; font-weight: 800; color: #4A4A4A; margin-bottom: 16px;">최종 점수: 0점</div>
+      <div style="font-size: 52px; margin-bottom: 8px;">🎉</div>
+      <div class="modal-title">참 잘했어요!</div>
+      <div id="finalScore" style="font-size: 20px; font-weight: 900; color: #334155; margin-bottom: 16px;">최종 점수: 0점</div>
       
       <button class="btn-main" onclick="resetGame()">다시 도전하기 🔄</button>
       <button class="btn-secondary" onclick="openLeaderboard()">🏆 전체 순위표 보기</button>
-      <button class="btn-secondary" style="background:#F5F5F5; color:#666;" onclick="openStartModal()">👤 학생 정보 바꾸기</button>
+      <button class="btn-secondary" style="background:#F1F5F9; color:#64748B;" onclick="openStartModal()">👤 학생 정보 바꾸기</button>
     </div>
   </div>
 
@@ -312,7 +348,7 @@
         </table>
       </div>
       <button class="btn-main" style="margin-top: 16px;" onclick="closeLeaderboard()">닫기</button>
-      <button class="btn-secondary" style="color: #FF7675; background: #FFF0F0;" onclick="clearLeaderboard()">🧹 순위 기록 초기화 (교사 전용)</button>
+      <button class="btn-secondary" style="color: #FF6B81; background: #FFF0F5;" onclick="clearLeaderboard()">🧹 순위 기록 초기화 (교사 전용)</button>
     </div>
   </div>
 
@@ -423,8 +459,9 @@
       ]
     };
 
+    // 알록달록 무작위로 섞일 파스텔 컬러 리스트
     const PASTEL_COLORS = ["#FFB7B2", "#FFDAC1", "#E2F0CB", "#B5EAD7", "#C7CEEA", "#FCE1E4", "#FFF1C5", "#E8DFF5"];
-    const MASCOTS = ["🐼", "🐰", "🐱", "🐻", "🐥", "🦊", "🦄", "🐶"];
+    const MASCOTS = ["🐻‍❄️", "🐰", "🐱", "🐻", "🐥", "🦊", "🦄", "🐶", "🐼"];
     const BOARD_SIZE = 6;
     
     let currentUser = { id: "", name: "", lesson: "" };
@@ -446,7 +483,7 @@
       const lesson = document.getElementById('lessonSelect').value;
 
       if (!studentId || !studentName) {
-        alert('학번과 이름을 모두 입력해주세요! 🌸');
+        alert('학번과 이름을 모두 입력해 주세요! 🌸');
         return;
       }
 
@@ -474,20 +511,15 @@
       }
 
       const MAX_ACTIVE = Math.min(8, shuffled.length);
-      const selectedWords = shuffled.slice(0, MAX_ACTIVE);
-
-      currentWords = selectedWords.map((item, idx) => ({
-        ...item,
-        id: idx,
-        bg: PASTEL_COLORS[idx % PASTEL_COLORS.length]
-      }));
+      currentWords = shuffled.slice(0, MAX_ACTIVE).map((item, idx) => ({ ...item, id: idx }));
     }
 
-    // 새로운 블록 생성 시 한자 타일 또는 뜻 타일 무작위 생성
+    // 핵심: 단어와 무관하게 완전히 무작위로 파스텔 색상을 부여하여 편법을 방지
     function getRandomTileInstance() {
       const randWord = currentWords[Math.floor(Math.random() * currentWords.length)];
       const displayType = Math.random() < 0.5 ? 'hanzi' : 'meaning';
-      return { ...randWord, displayType };
+      const randomBg = PASTEL_COLORS[Math.floor(Math.random() * PASTEL_COLORS.length)];
+      return { ...randWord, displayType, bg: randomBg };
     }
 
     function initBoard() {
@@ -533,9 +565,9 @@
                 <div class="tile-pinyin">${item.pinyin}</div>
               `;
             } else {
+              // '💡뜻' 제거 후 단어 뜻만 제시
               tile.innerHTML = `
                 <div class="tile-meaning">${item.meaning}</div>
-                <div class="tile-tag">💡 뜻</div>
               `;
             }
             tile.onclick = () => handleTileClick(r, c);
@@ -581,7 +613,6 @@
       board[r2][c2] = temp;
     }
 
-    // 같은 단어 ID를 가졌다면 한자/뜻 구분 없이 3개 이상 연속 매칭 인정
     function checkMatches() {
       let matched = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(false));
       let hasMatch = false;
@@ -715,7 +746,7 @@
       tbody.innerHTML = '';
 
       if (scores.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="color:#999; padding:16px;">등록된 기록이 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="color:#94A3B8; padding:16px;">등록된 기록이 없습니다.</td></tr>`;
       } else {
         scores.forEach((item, index) => {
           let rankMedal = index + 1;
@@ -729,7 +760,7 @@
             <td>${item.id}</td>
             <td>${item.name}</td>
             <td>${item.lesson}</td>
-            <td style="font-weight:800; color:#FF6B81;">${item.score}</td>
+            <td style="font-weight:900; color:#FF6B81;">${item.score}</td>
           `;
           tbody.appendChild(tr);
         });
