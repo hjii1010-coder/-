@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>단어 게임</title>
+  <style>
+    body { font-family: 'Pretendard', sans-serif; background: #f0f4f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+    .card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+    h1 { color: #1E293B; margin-top: 0; font-size: 24px; }
+    select, button { padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #cbd5e1; margin: 8px 0; width: 100%; box-sizing: border-box; }
+    button { background: #4F46E5; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    button:hover { background: #4338CA; }
+    .quiz-box { margin-top: 20px; display: none; }
+    .word-display { font-size: 30px; font-weight: bold; margin: 20px 0; color: #0F172A; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+    .option-btn { background: #F1F5F9; color: #334155; border: 1px solid #CBD5E1; }
+    .option-btn:hover { background: #E2E8F0; }
+    .score { font-size: 18px; font-weight: bold; color: #059669; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📚 영어 단어 퀴즈 게임</h1>
+    
+    <label for="unitSelect" style="font-weight:bold; display:block; text-align:left; margin-bottom:4px;">단원 선택</label>
+    <select id="unitSelect">
+      <option value="unit1_1">1단원 - 회화 본문 1</option>
+      <option value="unit1_2">1단원 - 회화 본문 2</option>
+      <option value="unit2_1">2단원 - 회화 본문 1</option>
+      <option value="unit2_2">2단원 - 회화 본문 2</option>
+    </select>
+
+    <button onclick="startGame()">게임 시작하기 🚀</button>
+
+    <div id="quizBox" class="quiz-box">
+      <div id="score" class="score">점수: 0</div>
+      <div id="wordDisplay" class="word-display">Word</div>
+      <div id="options" class="options-grid"></div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       💡 [선생님 수정 구역]
+       아래 단어와 뜻을 본문 내용에 맞게 자유롭게 수정/추가하세요!
+    ========================================================= */
+    const wordData = {
+      "unit1_1": [
+        { word: "Hello", meaning: "안녕하세요" },
+        { word: "Nice to meet you", meaning: "만나서 반가워요" },
+        { word: "Name", meaning: "이름" }
+      ],
+      "unit1_2": [
+        { word: "Where", meaning: "어디" },
+        { word: "Student", meaning: "학생" },
+        { word: "Friend", meaning: "친구" }
+      ],
+      "unit2_1": [
+        { word: "Hobby", meaning: "취미" },
+        { word: "Music", meaning: "음악" },
+        { word: "Sports", meaning: "운동" }
+      ],
+      "unit2_2": [
+        { word: "Tomorrow", meaning: "내일" },
+        { word: "Time", meaning: "시간" },
+        { word: "Together", meaning: "함께" }
+      ]
+    };
+
+    let currentWords = [];
+    let currentIndex = 0;
+    let score = 0;
+
+    function startGame() {
+      const unitKey = document.getElementById('unitSelect').value;
+      currentWords = [...wordData[unitKey]];
+      
+      if (!currentWords || currentWords.length === 0) {
+        alert('이 단원에 등록된 단어가 없습니다.');
+        return;
+      }
+
+      currentWords.sort(() => Math.random() - 0.5); // 단어 무작위 섞기
+      currentIndex = 0;
+      score = 0;
+      document.getElementById('quizBox').style.display = 'block';
+      updateScore();
+      nextQuestion();
+    }
+
+    function nextQuestion() {
+      if (currentIndex >= currentWords.length) {
+        alert(`🎉 축하합니다! 모든 문제를 풀었습니다.\n최종 점수: ${score}점`);
+        document.getElementById('quizBox').style.display = 'none';
+        return;
+      }
+
+      const currentWordObj = currentWords[currentIndex];
+      document.getElementById('wordDisplay').innerText = currentWordObj.word;
+
+      // 전체 단어 뜻 중에서 오답 보기 만들기
+      const allMeanings = Object.values(wordData).flat().map(w => w.meaning);
+      const wrongMeanings = allMeanings.filter(m => m !== currentWordObj.meaning).sort(() => Math.random() - 0.5);
+      const options = [currentWordObj.meaning, ...wrongMeanings.slice(0, 3)].sort(() => Math.random() - 0.5);
+
+      const optionsGrid = document.getElementById('options');
+      optionsGrid.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(opt, currentWordObj.meaning);
+        optionsGrid.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected, correct) {
+      if (selected === correct) {
+        score += 10;
+        alert('⭕ 정답입니다!');
+      } else {
+        alert(`❌ 아쉽네요! 정답은 "${correct}" 입니다.`);
+      }
+      updateScore();
+      currentIndex++;
+      nextQuestion();
+    }
+
+    function updateScore() {
+      document.getElementById('score').innerText = `점수: ${score}점`;
+    }
+  </script>
+</body>
+</html>
