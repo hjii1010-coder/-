@@ -16,13 +16,7 @@
       touch-action: manipulation; 
     }
     
-    html, body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-    }
+    html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
 
     body {
       font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -37,58 +31,36 @@
       min-height: 100dvh;
     }
 
+    @keyframes hintPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); border-color: #FFD700; transform: scale(1); }
+      50% { box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.9); border-color: #FF8C00; transform: scale(1.05); }
+    }
+
+    @keyframes bombPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
     .game-container {
-      width: 100%;
-      max-width: 460px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
+      width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; position: relative;
     }
 
     .user-badge {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(8px);
-      padding: 10px 18px;
-      border-radius: 24px;
-      font-size: 14px;
-      font-weight: 800;
-      color: #8B5CF6;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      border: 3px solid #FFF;
+      width: 100%; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(8px);
+      padding: 10px 18px; border-radius: 24px; font-size: 14px; font-weight: 800; color: #8B5CF6;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border: 3px solid #FFF;
     }
 
     .header {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #FFFFFF;
-      padding: 12px 22px;
-      border-radius: 24px;
-      margin-bottom: 12px;
-      box-shadow: 0 8px 24px rgba(255, 182, 193, 0.3);
-      border: 3px solid #FFF0F5;
+      width: 100%; display: flex; justify-content: space-between; align-items: center; background: #FFFFFF;
+      padding: 12px 22px; border-radius: 24px; margin-bottom: 12px; border: 3px solid #FFF0F5;
     }
     .stat-title { font-size: 12px; color: #94A3B8; margin-bottom: 2px; font-weight: 700; text-align: center; }
     .stat-value { font-size: 22px; font-weight: 900; color: #FF6B81; text-align: center; }
 
     .card-banner {
-      width: 100%;
-      height: 76px;
-      background: #FFFFFF;
-      border-radius: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 14px;
-      border: 3px solid #FFD1DC;
-      padding: 0 16px;
+      width: 100%; height: 76px; background: #FFFFFF; border-radius: 24px; display: flex; align-items: center;
+      justify-content: center; gap: 12px; margin-bottom: 14px; border: 3px solid #FFD1DC; padding: 0 16px;
     }
     .banner-mascot { font-size: 34px; }
     .banner-content { text-align: left; }
@@ -96,106 +68,41 @@
     .banner-sub { font-size: 13px; color: #FF6B81; font-weight: 800; }
 
     .grid-board {
-      width: 100%;
-      aspect-ratio: 1;
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.88);
-      padding: 10px;
-      border-radius: 28px;
-      border: 4px solid #FFF;
-      box-shadow: 0 14px 35px rgba(160, 108, 213, 0.18);
+      width: 100%; aspect-ratio: 1; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
+      background: rgba(255, 255, 255, 0.88); padding: 10px; border-radius: 28px; border: 4px solid #FFF; box-shadow: 0 14px 35px rgba(160, 108, 213, 0.18);
     }
 
     .tile {
-      aspect-ratio: 1;
-      width: 100%;
-      border-radius: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      cursor: pointer;
-      transition: transform 0.15s, background-color 0.2s;
-      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.9);
-      color: #2D3748;
-      padding: 2px;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.9);
+      aspect-ratio: 1; width: 100%; border-radius: 16px; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; font-weight: 800; cursor: pointer; transition: transform 0.15s, background-color 0.2s;
+      background-color: #F8FAFC; color: #2D3748; padding: 2px; text-align: center; border: 2px solid #E2E8F0;
     }
-    .tile.selected {
-      outline: 4px solid #FF6B81;
-      transform: scale(1.08);
-      z-index: 10;
-    }
+    .tile.selected { outline: 4px solid #FF6B81; border-color: #FF6B81; transform: scale(1.08); z-index: 10; background-color: #FFF0F5; }
+    .tile.hint { animation: hintPulse 1s infinite; z-index: 5; outline: 3px solid #FFD700; }
+    .tile.bomb { background-color: #FFF0F0; border-color: #FF4757; animation: bombPulse 1.2s infinite; }
     
     .tile-hanzi { font-size: 15px; font-weight: 900; line-height: 1.1; color: #1E293B; }
-    .tile-pinyin { font-size: 9.5px; opacity: 0.85; font-weight: 700; color: #475569; }
-    .tile-meaning { font-size: 11.5px; font-weight: 800; line-height: 1.2; color: #334155; }
+    .tile-pinyin { font-size: 9.5px; opacity: 0.85; font-weight: 700; color: #475569; margin-top: 2px; }
+    .tile-meaning { font-size: 12px; font-weight: 800; line-height: 1.2; color: #334155; }
 
     .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(139, 92, 246, 0.3);
-      backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      padding: 16px;
+      position: fixed; inset: 0; background: rgba(139, 92, 246, 0.3); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 16px;
     }
     .modal.show { opacity: 1; pointer-events: auto; }
     .modal-box {
-      background: #FFFFFF;
-      padding: 28px 22px;
-      border-radius: 32px;
-      text-align: center;
-      width: 100%;
-      max-width: 400px;
-      border: 4px solid #FFD1DC;
+      background: #FFFFFF; padding: 28px 22px; border-radius: 32px; text-align: center; width: 100%; max-width: 400px; border: 4px solid #FFD1DC;
     }
     .modal-title { font-size: 21px; font-weight: 900; color: #7C3AED; margin-bottom: 16px; }
     .input-group { margin-bottom: 14px; text-align: left; }
     .input-label { font-size: 13px; font-weight: 800; color: #64748B; margin-bottom: 6px; display: block; }
     .custom-input, .custom-select {
-      width: 100%;
-      padding: 12px 16px;
-      font-size: 15px;
-      font-weight: 700;
-      border: 2px solid #F1F5F9;
-      border-radius: 16px;
-      outline: none;
-      background: #F8FAFC;
+      width: 100%; padding: 12px 16px; font-size: 15px; font-weight: 700; border: 2px solid #F1F5F9; border-radius: 16px; background: #F8FAFC; outline: none;
     }
 
     .btn-main {
-      background: linear-gradient(135deg, #FF7675 0%, #FF6B81 100%);
-      color: white;
-      border: none;
-      padding: 15px;
-      font-size: 16px;
-      font-weight: 900;
-      border-radius: 20px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 10px;
-    }
-    .btn-secondary {
-      background: #F3E8FF;
-      color: #7C3AED;
-      border: none;
-      padding: 12px;
-      font-size: 14px;
-      font-weight: 800;
-      border-radius: 16px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 8px;
+      background: linear-gradient(135deg, #FF7675 0%, #FF6B81 100%); color: white; border: none; padding: 15px;
+      font-size: 16px; font-weight: 900; border-radius: 20px; cursor: pointer; width: 100%; margin-top: 10px; box-shadow: 0 6px 15px rgba(255, 107, 129, 0.3);
     }
   </style>
 </head>
@@ -221,27 +128,25 @@
     <div class="card-banner">
       <div class="banner-mascot" id="bannerMascot">🐥</div>
       <div class="banner-content">
-        <div id="bannerHanzi" class="banner-hanzi">중국어 애니팡!</div>
-        <div id="bannerSub" class="banner-sub">이웃한 카드를 교환해 3개를 이으세요!</div>
+        <div id="bannerHanzi" class="banner-hanzi">중국어 대각선 애니팡!</div>
+        <div id="bannerSub" class="banner-sub">상하좌우+대각선으로 교환해 3개를 이으세요!</div>
       </div>
     </div>
 
     <div id="board" class="grid-board"></div>
   </div>
 
-  <!-- 시작 모달 -->
   <div id="startModal" class="modal show">
     <div class="modal-box">
       <div style="font-size: 44px; margin-bottom: 6px;">🐼</div>
       <div class="modal-title">중국어회화 애니팡</div>
-      
       <div class="input-group">
         <label class="input-label">학번</label>
         <input type="text" id="studentId" class="custom-input" placeholder="예: 10101">
       </div>
       <div class="input-group">
         <label class="input-label">이름</label>
-        <input type="text" id="studentName" class="custom-input" placeholder="이름 입력">
+        <input type="text" id="studentName" class="custom-input" placeholder="예: 홍길동">
       </div>
       <div class="input-group">
         <label class="input-label">학습 단원 선택</label>
@@ -252,57 +157,32 @@
           <option value="2단원-회화2">📖 2단원 회화 2</option>
         </select>
       </div>
-
       <button class="btn-main" onclick="startGameWithUser()">게임 시작하기 🚀</button>
     </div>
   </div>
 
-  <!-- 게임 종료 모달 -->
   <div id="gameOverModal" class="modal">
     <div class="modal-box">
-      <div style="font-size: 52px; margin-bottom: 8px;">🎉</div>
-      <div class="modal-title">게임 종료!</div>
-      <div id="finalScore" style="font-size: 20px; font-weight: 900; color: #334155; margin-bottom: 16px;">0점</div>
-      <button class="btn-main" onclick="resetGame()">다시 하기 🔄</button>
+      <div style="font-size: 52px; margin-bottom: 8px;">📸</div>
+      <div class="modal-title">시간 종료! 캡처해주세요</div>
+      <div style="background: #F8FAFC; border-radius: 16px; padding: 16px; margin-bottom: 20px; border: 2px dashed #CBD5E1;">
+        <div id="finalUserInfo" style="font-size: 16px; font-weight: 800; color: #64748B; margin-bottom: 8px;"></div>
+        <div id="finalScore" style="font-size: 32px; font-weight: 900; color: #FF6B81;">0점</div>
+      </div>
+      <div style="font-size: 13px; color: #94A3B8; margin-bottom: 16px; font-weight: 700;">이 화면을 캡처해서 선생님께 제출하세요!</div>
+      <button class="btn-main" onclick="resetGame()">다시 도전하기 🔄</button>
     </div>
   </div>
 
   <script>
     const LESSON_DATA = {
-      "1단원-회화1": [
-        { hanzi: "好久", pinyin: "hǎojiǔ", meaning: "오랫동안" },
-        { hanzi: "不见", pinyin: "bújiàn", meaning: "만나지 않다" },
-        { hanzi: "暑假", pinyin: "shǔjià", meaning: "여름 방학" },
-        { hanzi: "过", pinyin: "guò", meaning: "지내다" },
-        { hanzi: "看", pinyin: "kàn", meaning: "보다" },
-        { hanzi: "书", pinyin: "shū", meaning: "책" }
-      ],
-      "1단원-회화2": [
-        { hanzi: "同学", pinyin: "tóngxué", meaning: "학우" },
-        { hanzi: "高兴", pinyin: "gāoxìng", meaning: "기쁘다" },
-        { hanzi: "觉得", pinyin: "juéde", meaning: "느끼다" },
-        { hanzi: "学习", pinyin: "xuéxí", meaning: "공부하다" },
-        { hanzi: "加油", pinyin: "jiāyóu", meaning: "화이팅" }
-      ],
-      "2단원-회화1": [
-        { hanzi: "参加", pinyin: "cānjiā", meaning: "참가하다" },
-        { hanzi: "社团", pinyin: "shètuán", meaning: "동아리" },
-        { hanzi: "电影", pinyin: "diànyǐng", meaning: "영화" },
-        { hanzi: "音乐", pinyin: "yīnyuè", meaning: "음악" },
-        { hanzi: "喜欢", pinyin: "xǐhuan", meaning: "좋아하다" }
-      ],
-      "2단원-회화2": [
-        { hanzi: "欢迎", pinyin: "huānyíng", meaning: "환영하다" },
-        { hanzi: "时间", pinyin: "shíjiān", meaning: "시간" },
-        { hanzi: "联系", pinyin: "liánxì", meaning: "연락하다" },
-        { hanzi: "加入", pinyin: "jiārù", meaning: "가입하다" },
-        { hanzi: "精彩", pinyin: "jīngcǎi", meaning: "멋지다" }
-      ]
+      "1단원-회화1": [{ hanzi: "好久", pinyin: "hǎojiǔ", meaning: "오랫동안" }, { hanzi: "不见", pinyin: "bújiàn", meaning: "만나지 않다" }, { hanzi: "暑假", pinyin: "shǔjià", meaning: "여름 방학" }, { hanzi: "过", pinyin: "guò", meaning: "지내다" }, { hanzi: "看", pinyin: "kàn", meaning: "보다" }, { hanzi: "书", pinyin: "shū", meaning: "책" }],
+      "1단원-회화2": [{ hanzi: "同学", pinyin: "tóngxué", meaning: "학우" }, { hanzi: "高兴", pinyin: "gāoxìng", meaning: "기쁘다" }, { hanzi: "觉得", pinyin: "juéde", meaning: "느끼다" }, { hanzi: "学习", pinyin: "xuéxí", meaning: "공부하다" }, { hanzi: "加油", pinyin: "jiāyóu", meaning: "화이팅" }, { hanzi: "努力", pinyin: "nǔlì", meaning: "열심히" }],
+      "2단원-회화1": [{ hanzi: "参加", pinyin: "cānjiā", meaning: "참가하다" }, { hanzi: "社团", pinyin: "shètuán", meaning: "동아리" }, { hanzi: "电影", pinyin: "diànyǐng", meaning: "영화" }, { hanzi: "音乐", pinyin: "yīnyuè", meaning: "음악" }, { hanzi: "喜欢", pinyin: "xǐhuan", meaning: "좋아하다" }, { hanzi: "报名", pinyin: "bàomíng", meaning: "신청하다" }],
+      "2단원-회화2": [{ hanzi: "欢迎", pinyin: "huānyíng", meaning: "환영하다" }, { hanzi: "时间", pinyin: "shíjiān", meaning: "시간" }, { hanzi: "联系", pinyin: "liánxì", meaning: "연락하다" }, { hanzi: "加入", pinyin: "jiārù", meaning: "가입하다" }, { hanzi: "精彩", pinyin: "jīngcǎi", meaning: "멋지다" }, { hanzi: "生活", pinyin: "shēnghuó", meaning: "생활" }]
     };
 
-    const COLORS = ["#FCF4F4", "#FCF6F0", "#FCFBF0", "#F2FAF3", "#F2FAF8", "#F1F6FC"];
     const BOARD_SIZE = 6;
-    
     let currentUser = { id: "", name: "", lesson: "" };
     let activeWords = [];
     let board = [];
@@ -311,11 +191,17 @@
     let timeLeft = 60;
     let timerInterval = null;
     let isProcessing = false;
+    
+    // 힌트용 변수 추가
+    let idleSeconds = 0;
+    let hintTiles = null;
+
+    function openStartModal() { document.getElementById('startModal').classList.add('show'); }
 
     function startGameWithUser() {
       const id = document.getElementById('studentId').value.trim();
       const name = document.getElementById('studentName').value.trim();
-      if (!id || !name) return alert('학번과 이름을 입력하세요!');
+      if (!id || !name) return alert('학번과 이름을 입력해 주세요!');
 
       currentUser = { id, name, lesson: document.getElementById('lessonSelect').value };
       document.getElementById('displayUserInfo').innerText = `👤 ${id} ${name}`;
@@ -324,31 +210,39 @@
     }
 
     function getRandomTileInstance() {
+      // 3% 확률로 폭탄 아이템 생성
+      if (Math.random() < 0.03) {
+        return { id: -999, displayType: 'bomb', isBomb: true };
+      }
       const randWord = activeWords[Math.floor(Math.random() * activeWords.length)];
       const displayType = Math.random() < 0.5 ? 'hanzi' : 'meaning';
-      return { ...randWord, displayType, bg: COLORS[randWord.id % COLORS.length] };
+      return { ...randWord, displayType, isBomb: false };
     }
 
     function initBoard() {
       const raw = LESSON_DATA[currentUser.lesson] || LESSON_DATA["1단원-회화1"];
       activeWords = raw.map((item, idx) => ({ ...item, id: idx }));
-
       board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
 
-      // 초기에 3개가 연속되지 않게 보드 세팅
       for (let r = 0; r < BOARD_SIZE; r++) {
         for (let c = 0; c < BOARD_SIZE; c++) {
           let item;
           do {
             item = getRandomTileInstance();
+            // 초기 배치 시 폭탄 안나오게 방지
+            if(item.isBomb) item = { ...activeWords[0], displayType: 'meaning', isBomb: false };
           } while (
             (r >= 2 && board[r-1][c].id === item.id && board[r-2][c].id === item.id) ||
-            (c >= 2 && board[r][c-1].id === item.id && board[r][c-2].id === item.id)
+            (c >= 2 && board[r][c-1].id === item.id && board[r][c-2].id === item.id) ||
+            // 초기 배치 대각선 매칭 방지
+            (r >= 2 && c >= 2 && board[r-1][c-1].id === item.id && board[r-2][c-2].id === item.id) ||
+            (r >= 2 && c <= BOARD_SIZE-3 && board[r-1][c+1].id === item.id && board[r-2][c+2].id === item.id)
           );
           board[r][c] = item;
         }
       }
       renderBoard();
+      checkAutoShuffle(); // 시작부터 매칭 안되면 섞기
     }
 
     function renderBoard() {
@@ -360,14 +254,20 @@
           const tile = document.createElement('div');
           tile.className = 'tile';
           if (item) {
-            tile.style.backgroundColor = item.bg;
-            tile.innerHTML = item.displayType === 'hanzi' 
-              ? `<div class="tile-hanzi">${item.hanzi}</div><div class="tile-pinyin">${item.pinyin}</div>`
-              : `<div class="tile-meaning">${item.meaning}</div>`;
-            
-            if (selectedTile && selectedTile.r === r && selectedTile.c === c) {
-              tile.classList.add('selected');
+            if (item.isBomb) {
+              tile.classList.add('bomb');
+              tile.innerHTML = `<div style="font-size:24px;">💣</div><div class="tile-meaning" style="color:#FF4757;">폭탄</div>`;
+            } else {
+              tile.innerHTML = item.displayType === 'hanzi' 
+                ? `<div class="tile-hanzi">${item.hanzi}</div><div class="tile-pinyin">${item.pinyin}</div>`
+                : `<div class="tile-meaning">${item.meaning}</div>`;
             }
+            
+            if (selectedTile && selectedTile.r === r && selectedTile.c === c) tile.classList.add('selected');
+            
+            // 힌트 타일 효과 적용
+            if (hintTiles && hintTiles.some(t => t.r === r && t.c === c)) tile.classList.add('hint');
+
             tile.onclick = () => handleTileClick(r, c);
           }
           boardEl.appendChild(tile);
@@ -377,6 +277,18 @@
 
     async function handleTileClick(r, c) {
       if (isProcessing || timeLeft <= 0) return;
+      
+      idleSeconds = 0; // 클릭 시 힌트 타이머 리셋
+      hintTiles = null; // 힌트 끄기
+
+      // 폭탄 클릭 처리
+      if (board[r][c] && board[r][c].isBomb) {
+        isProcessing = true;
+        selectedTile = null;
+        await triggerBomb(r, c);
+        isProcessing = false;
+        return;
+      }
 
       if (!selectedTile) {
         selectedTile = { r, c };
@@ -385,7 +297,9 @@
       }
 
       const r1 = selectedTile.r, c1 = selectedTile.c;
-      const isAdjacent = (Math.abs(r1 - r) + Math.abs(c1 - c)) === 1;
+      
+      // 상하좌우 + 대각선 인접 여부 확인 (8방향 허용)
+      const isAdjacent = (Math.abs(r1 - r) <= 1 && Math.abs(c1 - c) <= 1) && !(r1 === r && c1 === c);
 
       if (isAdjacent) {
         isProcessing = true;
@@ -395,9 +309,11 @@
 
         const matched = await processMatches();
         if (!matched) {
-          // 매칭 실패 시 원위치
-          swapTiles(r1, c1, r, c);
+          await new Promise(res => setTimeout(res, 300));
+          swapTiles(r1, c1, r, c); // 원위치
           renderBoard();
+        } else {
+          checkAutoShuffle(); // 매칭 완료 후 더 움직일 수 있는지 확인
         }
         isProcessing = false;
       } else {
@@ -406,34 +322,76 @@
       }
     }
 
+    // 폭탄 3x3 폭파 함수
+    async function triggerBomb(centerR, centerC) {
+      document.getElementById('bannerHanzi').innerText = "💥 폭탄 폭발!";
+      document.getElementById('bannerSub').innerText = "주변 타일이 모두 사라집니다!";
+      let count = 0;
+
+      for (let r = Math.max(0, centerR - 1); r <= Math.min(BOARD_SIZE - 1, centerR + 1); r++) {
+        for (let c = Math.max(0, centerC - 1); c <= Math.min(BOARD_SIZE - 1, centerC + 1); c++) {
+          if (board[r][c]) {
+            board[r][c] = null;
+            count++;
+          }
+        }
+      }
+
+      score += count * 50; // 폭탄 점수
+      document.getElementById('score').innerText = score;
+      renderBoard();
+      await new Promise(res => setTimeout(res, 300));
+      dropTiles();
+      renderBoard();
+      await new Promise(res => setTimeout(res, 300));
+      await processMatches();
+      checkAutoShuffle();
+    }
+
     function swapTiles(r1, c1, r2, c2) {
       const temp = board[r1][c1];
       board[r1][c1] = board[r2][c2];
       board[r2][c2] = temp;
     }
 
+    // 대각선 포함 매칭 검사
     function checkMatches() {
       let matched = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(false));
       let hasMatch = false;
 
-      // 가로 검사
+      // 1. 가로 검사
       for (let r = 0; r < BOARD_SIZE; r++) {
         for (let c = 0; c < BOARD_SIZE - 2; c++) {
           let id = board[r][c]?.id;
-          if (id !== undefined && id === board[r][c+1]?.id && id === board[r][c+2]?.id) {
-            matched[r][c] = matched[r][c+1] = matched[r][c+2] = true;
-            hasMatch = true;
+          if (id !== undefined && id !== -999 && id === board[r][c+1]?.id && id === board[r][c+2]?.id) {
+            matched[r][c] = matched[r][c+1] = matched[r][c+2] = true; hasMatch = true;
           }
         }
       }
-
-      // 세로 검사
+      // 2. 세로 검사
       for (let c = 0; c < BOARD_SIZE; c++) {
         for (let r = 0; r < BOARD_SIZE - 2; r++) {
           let id = board[r][c]?.id;
-          if (id !== undefined && id === board[r+1][c]?.id && id === board[r+2][c]?.id) {
-            matched[r][c] = matched[r+1][c] = matched[r+2][c] = true;
-            hasMatch = true;
+          if (id !== undefined && id !== -999 && id === board[r+1][c]?.id && id === board[r+2][c]?.id) {
+            matched[r][c] = matched[r+1][c] = matched[r+2][c] = true; hasMatch = true;
+          }
+        }
+      }
+      // 3. 대각선 검사 ↘ (좌상 -> 우하)
+      for (let r = 0; r < BOARD_SIZE - 2; r++) {
+        for (let c = 0; c < BOARD_SIZE - 2; c++) {
+          let id = board[r][c]?.id;
+          if (id !== undefined && id !== -999 && id === board[r+1][c+1]?.id && id === board[r+2][c+2]?.id) {
+            matched[r][c] = matched[r+1][c+1] = matched[r+2][c+2] = true; hasMatch = true;
+          }
+        }
+      }
+      // 4. 대각선 검사 ↙ (우상 -> 좌하)
+      for (let r = 0; r < BOARD_SIZE - 2; r++) {
+        for (let c = 2; c < BOARD_SIZE; c++) {
+          let id = board[r][c]?.id;
+          if (id !== undefined && id !== -999 && id === board[r+1][c-1]?.id && id === board[r+2][c-2]?.id) {
+            matched[r][c] = matched[r+1][c-1] = matched[r+2][c-2] = true; hasMatch = true;
           }
         }
       }
@@ -443,6 +401,8 @@
     async function processMatches() {
       let { hasMatch, matched } = checkMatches();
       if (!hasMatch) return false;
+
+      let comboMultiplier = 1;
 
       while (hasMatch) {
         let count = 0;
@@ -458,27 +418,32 @@
           }
         }
 
-        if (matchedWord) {
-          document.getElementById('bannerHanzi').innerText = `${matchedWord.hanzi} (${matchedWord.pinyin})`;
+        if (matchedWord && matchedWord.id !== -999) {
+          document.getElementById('bannerHanzi').innerText = `${comboMultiplier}콤보! ${matchedWord.hanzi} (${matchedWord.pinyin})`;
           document.getElementById('bannerSub').innerText = `뜻: ${matchedWord.meaning}`;
         }
 
-        score += count * 100;
+        score += count * 100 * comboMultiplier;
         document.getElementById('score').innerText = score;
 
         renderBoard();
         await new Promise(res => setTimeout(res, 250));
 
-        // 애니팡 중력 (블록 떨어뜨리기)
         dropTiles();
         renderBoard();
         await new Promise(res => setTimeout(res, 250));
 
-        // 연쇄 반응 확인
         const res = checkMatches();
         hasMatch = res.hasMatch;
         matched = res.matched;
+        comboMultiplier++;
       }
+      
+      setTimeout(() => {
+        document.getElementById('bannerHanzi').innerText = "중국어 대각선 애니팡!";
+        document.getElementById('bannerSub').innerText = "상하좌우+대각선으로 교환해 3개를 이으세요!";
+      }, 1500);
+
       return true;
     }
 
@@ -492,33 +457,67 @@
             emptyRow--;
           }
         }
-        // 빈 곳 채우기
         for (let r = emptyRow; r >= 0; r--) {
           board[r][c] = getRandomTileInstance();
         }
       }
     }
 
-    function resetGame() {
-      score = 0;
-      timeLeft = 60;
-      selectedTile = null;
-      document.getElementById('score').innerText = '0';
-      document.getElementById('timer').innerText = '60s';
-      document.getElementById('gameOverModal').classList.remove('show');
-      initBoard();
-      
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById('timer').innerText = `${timeLeft}s`;
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          document.getElementById('finalScore').innerText = `최종 점수: ${score}점`;
-          document.getElementById('gameOverModal').classList.add('show');
+    // 움직일 수 있는 카드가 있는지 8방향 시뮬레이션
+    function hasPossibleMove() {
+      const dirs = [[0,1], [1,0], [1,1], [1,-1]]; // 가로, 세로, 대각선↘, 대각선↙
+      for(let r = 0; r < BOARD_SIZE; r++) {
+        for(let c = 0; c < BOARD_SIZE; c++) {
+          if(board[r][c]?.isBomb) return [{r,c}]; // 폭탄이 있으면 무조건 진행 가능
+          for(let [dr, dc] of dirs) {
+            let nr = r + dr, nc = c + dc;
+            if(nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) {
+              swapTiles(r, c, nr, nc);
+              let match = checkMatches().hasMatch;
+              swapTiles(r, c, nr, nc); // 원상복구
+              if(match) return [{r, c}, {r: nr, c: nc}];
+            }
+          }
         }
-      }, 1000);
+      }
+      return null;
     }
-  </script>
-</body>
-</html>
+
+    // 자동 섞기 체크 함수
+    async function checkAutoShuffle() {
+      if (!hasPossibleMove()) {
+        document.getElementById('bannerHanzi').innerText = "매칭 불가! 보드를 섞습니다 🔄";
+        document.getElementById('bannerSub').innerText = "";
+        await new Promise(res => setTimeout(res, 1000));
+        
+        // 보드 내 타일들 수집 후 섞기
+        let tiles = [];
+        for(let r=0; r<BOARD_SIZE; r++){
+            현재 작업 중이신 게임 프로젝트의 **전체 코드나 개발 환경을 제가 직접 볼 수는 없기 때문에**, 말씀하신 힌트 기능이나 아이템 카드가 현재 프로젝트에서 정상적으로 작동하고 있는지 바로 확인해 드리기는 어렵습니다. 
+
+하지만 원하시는 기능들을 게임에 어떻게 구현하고 추가할 수 있는지 핵심 로직을 정리해 드릴게요! 
+
+## 1. 15초 미조작 시 힌트 제공 로직
+힌트 기능은 플레이어의 피로도를 낮춰주는 아주 좋은 접근입니다. 다음과 같은 로직이 코드에 포함되어 있는지 확인하거나 추가해야 합니다.
+*   **타이머 초기화:** 사용자가 블록을 클릭하거나, 매칭에 성공하거나, 위치를 바꿀 때마다 타이머 변수를 0으로 리셋합니다.
+*   **시간 측정:** 게임 루프(예: Unity의 `Update()` 또는 웹의 `setInterval`)에서 경과 시간을 계속 더합니다.
+*   **힌트 트리거:** 타이머가 15초를 초과하면, 보드 내에서 매칭 가능한 블록 쌍을 찾는 함수를 실행하여 시각적인 효과(반짝임, 흔들림 등)를 줍니다.
+
+## 2. 폭탄 및 랜덤 섞기 아이템 구현
+이러한 게임 요소는 교육용 게임이라도 흥미를 크게 끌어올릴 수 있습니다.
+*   **폭탄 카드:** 특정 블록이나 카드를 선택했을 때, 해당 좌표 `(x, y)`를 기준으로 주변 3x3 또는 십자 형태의 블록 데이터를 배열에서 즉시 `null`로 만들거나 파괴(Destroy) 처리하는 함수를 연결합니다.
+*   **랜덤 섞기 (Shuffle):** 매칭할 블록이 없거나 사용자가 카드를 사용했을 때, 현재 보드에 남은 블록들의 데이터 배열을 무작위로 재배치(Fisher-Yates 셔플 알고리즘 등 활용)하여 다시 화면에 렌더링합니다.
+
+## 3. 대각선(Diagonal) 3매칭 알고리즘 추가
+위, 아래, 양옆을 검사하는 기존 로직에 아래 두 가지 **대각선 탐색 조건**을 추가해야 합니다. 블록이 3개 매칭되어야 하므로 기준점 `(x, y)`에서 연속된 두 칸을 검사합니다.
+
+*   **우하향(↘) 매칭 검사:** 
+    `(x, y)`, `(x+1, y+1)`, `(x+2, y+2)`가 같은 블록인지 확인.
+*   **우상향(↗) 매칭 검사:** 
+    `(x, y)`, `(x+1, y-1)`, `(x+2, y-2)`가 같은 블록인지 확인.
+
+> **주의사항:** 탐색 시 `x+2`나 `y-2` 등이 게임 보드의 최대/최소 크기(Array Index)를 벗어나지 않도록 **경계값 검사(Out of Bounds Exception 방지)**를 반드시 먼저 해주어야 합니다.
+
+---
+
+제가 정확한 코드 수정을 도와드리고 싶은데, 현재 **어떤 언어와 엔진(예: Unity C#, 웹 기반 JavaScript/React 등)으로 개발 중이신가요?** 기존의 블록 매칭을 검사하는 부분의 코드를 복사해서 보여주시면 대각선 매칭과 힌트 로직 코드를 바로 짜드릴 수 있습니다!
