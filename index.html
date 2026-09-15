@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>🌸 중국어회화 단어 애니팡 🐼</title>
+  <title>🌸 중국어회화 단어 매칭 애니팡 🐼</title>
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
@@ -30,7 +30,7 @@
       align-items: center;
     }
 
-    /* 상단 학번/이름 표시 바 */
+    /* 상단 유저 정보 바 */
     .user-badge {
       width: 100%;
       background: rgba(255, 255, 255, 0.85);
@@ -67,21 +67,21 @@
     /* 단어 표시 카드 */
     .card-banner {
       width: 100%;
-      height: 70px;
+      height: 72px;
       background: #FFFFFF;
       border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 14px;
       border: 3px solid #FFD1DC;
       box-shadow: 0 8px 20px rgba(255, 209, 220, 0.3);
-      position: relative;
+      padding: 0 12px;
     }
     .banner-mascot { font-size: 28px; }
     .banner-content { text-align: left; }
-    .banner-hanzi { font-size: 22px; font-weight: 800; color: #6C5CE7; }
+    .banner-hanzi { font-size: 20px; font-weight: 800; color: #6C5CE7; }
     .banner-sub { font-size: 13px; color: #FF7675; font-weight: 700; }
 
     /* 게임 그리드 판 */
@@ -109,6 +109,9 @@
       transition: transform 0.15s ease, box-shadow 0.2s;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), inset 0 -3px 0 rgba(0,0,0,0.1);
       color: #333333;
+      padding: 2px;
+      text-align: center;
+      word-break: keep-all;
     }
     .tile:active { transform: scale(0.92); }
     .tile.selected {
@@ -117,10 +120,16 @@
       z-index: 10;
       box-shadow: 0 0 18px rgba(255, 107, 129, 0.5);
     }
-    .tile-hanzi { font-size: 15px; font-weight: 800; line-height: 1.1; margin-bottom: 2px; }
-    .tile-pinyin { font-size: 9px; opacity: 0.85; font-weight: 600; }
+    
+    /* 한자/병음 타일 스타일 */
+    .tile-hanzi { font-size: 15px; font-weight: 800; line-height: 1.1; margin-bottom: 2px; color: #2D3748; }
+    .tile-pinyin { font-size: 9px; opacity: 0.85; font-weight: 600; color: #4A5568; }
 
-    /* 모달 공통 */
+    /* 뜻 타일 스타일 */
+    .tile-meaning { font-size: 12px; font-weight: 800; line-height: 1.2; color: #5B21B6; }
+    .tile-tag { font-size: 8px; opacity: 0.7; margin-top: 2px; font-weight: 600; color: #7C3AED; }
+
+    /* 모달 */
     .modal {
       position: fixed;
       inset: 0;
@@ -150,7 +159,6 @@
 
     .modal-title { font-size: 24px; font-weight: 800; color: #6C5CE7; margin-bottom: 16px; }
     
-    /* 입력 폼 스타일 */
     .input-group { margin-bottom: 14px; text-align: left; }
     .input-label { font-size: 13px; font-weight: 700; color: #8E8E93; margin-bottom: 6px; display: block; }
     .custom-input, .custom-select {
@@ -163,7 +171,6 @@
       outline: none;
       background: #FAFAFA;
       color: #4A4A4A;
-      transition: border-color 0.2s;
     }
     .custom-input:focus, .custom-select:focus {
       border-color: #A29BFE;
@@ -198,7 +205,6 @@
       margin-top: 8px;
     }
 
-    /* 순위표 테이블 스타일 */
     .rank-table {
       width: 100%;
       border-collapse: collapse;
@@ -213,13 +219,11 @@
 <body>
 
   <div class="game-container">
-    <!-- 유저 정보 바 -->
     <div class="user-badge">
       <span id="displayUserInfo">👤 학생 정보 미입력</span>
       <button onclick="openStartModal()" style="border:none; background:none; color:#7C3AED; font-weight:700; cursor:pointer; font-size:12px;">⚙️ 변경</button>
     </div>
 
-    <!-- 스코어 헤더 -->
     <div class="header">
       <div class="stat-box">
         <div class="stat-title">⏰ 남은 시간</div>
@@ -231,24 +235,22 @@
       </div>
     </div>
 
-    <!-- 카드 배너 -->
     <div class="card-banner">
       <div class="banner-mascot" id="bannerMascot">🐼</div>
       <div class="banner-content">
-        <div id="bannerHanzi" class="banner-hanzi">중국어 애니팡</div>
-        <div id="bannerSub" class="banner-sub">3개를 연결해 단어를 맞춰보세요!</div>
+        <div id="bannerHanzi" class="banner-hanzi">한자&뜻 짝맞추기</div>
+        <div id="bannerSub" class="banner-sub">한자/병음과 뜻을 맞춰 3개를 완성하세요!</div>
       </div>
     </div>
 
-    <!-- 퍼즐 판 -->
     <div id="board" class="grid-board"></div>
   </div>
 
-  <!-- 1. 시작 모달 (학번, 이름, 단원 선택) -->
+  <!-- 시작 모달 -->
   <div id="startModal" class="modal show">
     <div class="modal-box">
       <div style="font-size: 40px; margin-bottom: 8px;">🎀</div>
-      <div class="modal-title">중국어 단어 애니팡</div>
+      <div class="modal-title">중국어 단어&뜻 애니팡</div>
       
       <div class="input-group">
         <label class="input-label">학번 (예: 10101)</label>
@@ -278,7 +280,7 @@
     </div>
   </div>
 
-  <!-- 2. 게임 종료 모달 -->
+  <!-- 게임 종료 모달 -->
   <div id="gameOverModal" class="modal">
     <div class="modal-box">
       <div style="font-size: 48px; margin-bottom: 8px;">🎉</div>
@@ -291,7 +293,7 @@
     </div>
   </div>
 
-  <!-- 3. 교사용 점수 순위표 모달 -->
+  <!-- 교사용 순위표 모달 -->
   <div id="leaderboardModal" class="modal">
     <div class="modal-box">
       <div class="modal-title">🏆 학생 점수 순위표</div>
@@ -306,9 +308,7 @@
               <th>점수</th>
             </tr>
           </thead>
-          <tbody id="rankTableBody">
-            <!-- 자바스크립트로 동적 생성 -->
-          </tbody>
+          <tbody id="rankTableBody"></tbody>
         </table>
       </div>
       <button class="btn-main" style="margin-top: 16px;" onclick="closeLeaderboard()">닫기</button>
@@ -317,7 +317,6 @@
   </div>
 
   <script>
-    // 단원 데이터
     const LESSON_DATA = {
       "1단원-회화1": [
         { hanzi: "好久", pinyin: "hǎojiǔ", meaning: "오랫동안" },
@@ -424,18 +423,7 @@
       ]
     };
 
-    // 귀여운 파스텔 톤 타일 색상 패브릭
-    const PASTEL_COLORS = [
-      "#FFB7B2", // 파스텔 코랄
-      "#FFDAC1", // 파스텔 피치
-      "#E2F0CB", // 파스텔 올리브
-      "#B5EAD7", // 파스텔 민트
-      "#C7CEEA", // 파스텔 라벤더
-      "#FCE1E4", // 파스텔 로즈
-      "#FFF1C5", // 파스텔 버터
-      "#E8DFF5"  // 파스텔 바이올렛
-    ];
-
+    const PASTEL_COLORS = ["#FFB7B2", "#FFDAC1", "#E2F0CB", "#B5EAD7", "#C7CEEA", "#FCE1E4", "#FFF1C5", "#E8DFF5"];
     const MASCOTS = ["🐼", "🐰", "🐱", "🐻", "🐥", "🦊", "🦄", "🐶"];
     const BOARD_SIZE = 6;
     
@@ -448,7 +436,6 @@
     let timerInterval = null;
     let isProcessing = false;
 
-    // 모달 제어
     function openStartModal() {
       document.getElementById('startModal').classList.add('show');
     }
@@ -480,7 +467,6 @@
         rawList = LESSON_DATA[selectedKey] || [];
       }
 
-      // 무작위 셔플
       let shuffled = [...rawList];
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -497,6 +483,13 @@
       }));
     }
 
+    // 새로운 블록 생성 시 한자 타일 또는 뜻 타일 무작위 생성
+    function getRandomTileInstance() {
+      const randWord = currentWords[Math.floor(Math.random() * currentWords.length)];
+      const displayType = Math.random() < 0.5 ? 'hanzi' : 'meaning';
+      return { ...randWord, displayType };
+    }
+
     function initBoard() {
       loadWordList();
       const boardEl = document.getElementById('board');
@@ -506,14 +499,14 @@
       for (let r = 0; r < BOARD_SIZE; r++) {
         board[r] = [];
         for (let c = 0; c < BOARD_SIZE; c++) {
-          let word;
+          let tileItem;
           do {
-            word = currentWords[Math.floor(Math.random() * currentWords.length)];
+            tileItem = getRandomTileInstance();
           } while (
-            (r >= 2 && board[r-1][c].id === word.id && board[r-2][c].id === word.id) ||
-            (c >= 2 && board[r][c-1].id === word.id && board[r][c-2].id === word.id)
+            (r >= 2 && board[r-1][c].id === tileItem.id && board[r-2][c].id === tileItem.id) ||
+            (c >= 2 && board[r][c-1].id === tileItem.id && board[r][c-2].id === tileItem.id)
           );
-          board[r][c] = { ...word };
+          board[r][c] = tileItem;
         }
       }
       renderBoard();
@@ -528,14 +521,23 @@
           const tile = document.createElement('div');
           tile.className = 'tile';
           tile.style.backgroundColor = item ? item.bg : 'transparent';
+          
           if (selectedTile && selectedTile.r === r && selectedTile.c === c) {
             tile.classList.add('selected');
           }
+          
           if (item) {
-            tile.innerHTML = `
-              <div class="tile-hanzi">${item.hanzi}</div>
-              <div class="tile-pinyin">${item.pinyin}</div>
-            `;
+            if (item.displayType === 'hanzi') {
+              tile.innerHTML = `
+                <div class="tile-hanzi">${item.hanzi}</div>
+                <div class="tile-pinyin">${item.pinyin}</div>
+              `;
+            } else {
+              tile.innerHTML = `
+                <div class="tile-meaning">${item.meaning}</div>
+                <div class="tile-tag">💡 뜻</div>
+              `;
+            }
             tile.onclick = () => handleTileClick(r, c);
           }
           boardEl.appendChild(tile);
@@ -579,6 +581,7 @@
       board[r2][c2] = temp;
     }
 
+    // 같은 단어 ID를 가졌다면 한자/뜻 구분 없이 3개 이상 연속 매칭 인정
     function checkMatches() {
       let matched = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(false));
       let hasMatch = false;
@@ -657,8 +660,7 @@
           }
         }
         for (let r = emptyRow; r >= 0; r--) {
-          const randWord = currentWords[Math.floor(Math.random() * currentWords.length)];
-          board[r][c] = { ...randWord };
+          board[r][c] = getRandomTileInstance();
         }
       }
     }
@@ -693,7 +695,6 @@
       startTimer();
     }
 
-    // --- 점수 저장 및 순위표 (localStorage 기반) ---
     function saveScore(id, name, lesson, score) {
       if (!id || !name) return;
       let scores = JSON.parse(localStorage.getItem('chineseGameScores') || "[]");
@@ -704,7 +705,6 @@
         score: score,
         date: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
       });
-      // 점수 높은 순으로 정렬
       scores.sort((a, b) => b.score - a.score);
       localStorage.setItem('chineseGameScores', JSON.stringify(scores));
     }
