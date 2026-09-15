@@ -33,6 +33,12 @@
       50% { transform: scale(1.08); }
     }
 
+    /* 10초 힌트용 반짝임 애니메이션 */
+    @keyframes hintPulse {
+      0%, 100% { transform: scale(1); outline: 4px solid #FFD700; box-shadow: 0 0 15px #FFD700; }
+      50% { transform: scale(1.08); outline: 4px solid #FF4500; box-shadow: 0 0 25px #FF4500; }
+    }
+
     .game-container {
       width: 100%;
       max-width: 440px;
@@ -121,7 +127,7 @@
       box-shadow: 0 14px 35px rgba(160, 108, 213, 0.18);
     }
 
-    /* 정사각형 통일 타일 스타일 */
+    /* 타일 스타일 */
     .tile {
       aspect-ratio: 1;
       width: 100%;
@@ -149,6 +155,11 @@
       transform: scale(1.08) rotate(2deg);
       z-index: 10;
       box-shadow: 0 0 18px rgba(255, 107, 129, 0.6);
+    }
+
+    .tile.hint-tile {
+      animation: hintPulse 1s infinite ease-in-out !important;
+      z-index: 12;
     }
 
     .tile.bomb-tile {
@@ -448,16 +459,9 @@
       ]
     };
 
-    // 명도 95% 수준의 초미세 은은한 파스텔 톤 팔레트
     const WORD_COLORS = [
-      "#FCF4F4",
-      "#FCF6F0",
-      "#FCFBF0",
-      "#F2FAF3",
-      "#F2FAF8",
-      "#F1F6FC",
-      "#F7F2FC",
-      "#FCF2F7"
+      "#FCF4F4", "#FCF6F0", "#FCFBF0", "#F2FAF3",
+      "#F2FAF8", "#F1F6FC", "#F7F2FC", "#FCF2F7"
     ];
     
     const MASCOTS = ["🐻‍❄️", "🐰", "🐱", "🐻", "🐥", "🦊", "🦄", "🐶", "🐼"];
@@ -471,6 +475,10 @@
     let timeLeft = 100;
     let timerInterval = null;
     let isProcessing = false;
+    
+    // 힌트 시스템 관련 변수
+    let idleSeconds = 0;
+    let hintPairs = null;
 
     function openStartModal() {
       document.getElementById('startModal').classList.add('show');
@@ -543,6 +551,7 @@
           board[r][c] = tileItem;
         }
       }
+      clearHint();
       renderBoard();
     }
 
@@ -558,6 +567,11 @@
           
           if (selectedTile && selectedTile.r === r && selectedTile.c === c) {
             tile.classList.add('selected');
+          }
+
+          // 힌트 타일 강조 애니메이션 적용
+          if (hintPairs && hintPairs.some(p => p.r === r && p.c === c)) {
+            tile.classList.add('hint-tile');
           }
           
           if (item) {
@@ -584,9 +598,54 @@
       }
     }
 
+    function clearHint() {
+      idleSeconds = 0;
+      hintPairs = null;
+    }
+
+    // 10초 무반응 시 바꿀 수 있는 타일쌍 탐색
+    function findAndShowHint() {
+      if (hintPairs || isProcessing) return;
+
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          // 오른쪽 타일과 교환 테스트
+          if (c < BOARD_SIZE - 1) {
+            swapTiles(r, c, r, c + 1);
+            if (checkMatches().hasMatch) {
+              swapTiles(r, c, r, c + 1); // 원복
+              hintPairs = [{r, c}, {r, c: c + 1}];
+              document.getElementById('bannerHanzi').innerText = "💡 힌트 전달!";
+              document.getElementById('bannerSub').innerText = "반짝이는 두 카드의 위치를 바꿔보세요!";
+              document.getElementById('bannerMascot').innerText = "✨";
+              renderBoard();
+              return;
+            }
+            swapTiles(r, c, r, c + 1); // 원복
+          }
+
+          // 아래쪽 타일과 교환 테스트
+          if (r < BOARD_SIZE - 1) {
+            swapTiles(r, c, r + 1, c);
+            if (checkMatches().hasMatch) {
+              swapTiles(r, c, r + 1, c); // 원복
+              hintPairs = [{r, c}, {r: r + 1, c}];
+              document.getElementById('bannerHanzi').innerText = "💡 힌트 전달!";
+              document.getElementById('bannerSub').innerText = "반짝이는 두 카드의 위치를 바꿔보세요!";
+              document.getElementById('bannerMascot').innerText = "✨";
+              renderBoard();
+              return;
+            }
+            swapTiles(r, c, r + 1, c); // 원복
+          }
+        }
+      }
+    }
+
     async function handleTileClick(r, c) {
       if (isProcessing || timeLeft <= 0) return;
 
+      clearHint(); // 클릭 시 힌트 및 타이머 리셋
       const clickedItem = board[r][c];
 
       if (clickedItem && clickedItem.isBomb) {
@@ -689,6 +748,7 @@
       let { hasMatch, matched } = checkMatches();
       if (!hasMatch) return false;
 
+      clearHint(); // 매칭 성공 시 힌트 타이머 초기화
       let totalMatchedCount = 0;
       let lastWord = null;
 
@@ -746,7 +806,14 @@
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timeLeft--;
+        idleSeconds++;
         document.getElementById('timer').innerText = `${timeLeft}s`;
+
+        // 10초 이상 유휴 상태일 때 힌트 출력
+        if (idleSeconds >= 10) {
+          findAndShowHint();
+        }
+
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
           endGame();
@@ -765,6 +832,7 @@
       timeLeft = 100;
       selectedTile = null;
       isProcessing = false;
+      clearHint();
       document.getElementById('score').innerText = '0';
       document.getElementById('timer').innerText = '100s';
       document.getElementById('gameOverModal').classList.remove('show');
@@ -816,7 +884,7 @@
     }
 
     function closeLeaderboard() {
-      document.getElementById('leaderboardModal').classList.remove('show');
+      document.getElementById('leaderboardModal').classList.add('show');
     }
 
     function clearLeaderboard() {
