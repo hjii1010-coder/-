@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>고등 중국어 단원별 애니팡</title>
+  <title>중국어 회화 1, 2단원 단어 애니팡</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
     body {
@@ -189,7 +189,6 @@
   </div>
 
   <script>
-    // 단원별 단어 데이터 구역 (수정 가능)
     const LESSON_DATA = {
       "1단원-회화1": [
         { hanzi: "好久", pinyin: "hǎojiǔ", meaning: "오랫동안" },
@@ -306,6 +305,7 @@
     let timerInterval = null;
     let isProcessing = false;
 
+    // 단어 목록 무작위 셔플 및 판 구성용 단어 추출
     function loadWordList() {
       const selectedKey = document.getElementById('lessonSelect').value;
       let rawList = [];
@@ -316,7 +316,19 @@
         rawList = LESSON_DATA[selectedKey] || [];
       }
 
-      currentWords = rawList.map((item, idx) => ({
+      // Fisher-Yates 셔플 알고리즘으로 단어 순서 랜덤 섞기
+      let shuffled = [...rawList];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      // 게임 플레이 가능성(매칭 확률)을 위해 셔플된 단어 중 최대 8개 랜덤 추출
+      const MAX_ACTIVE = Math.min(8, shuffled.length);
+      const selectedWords = shuffled.slice(0, MAX_ACTIVE);
+
+      // 추출된 단어에 고유 ID 및 타일 색상 무작위 할당
+      currentWords = selectedWords.map((item, idx) => ({
         ...item,
         id: idx,
         bg: TILE_COLORS[idx % TILE_COLORS.length]
