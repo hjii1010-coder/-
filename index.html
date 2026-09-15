@@ -252,7 +252,7 @@
     <div class="header">
       <div class="stat-box">
         <div class="stat-title">⏰ 남은 시간</div>
-        <div id="timer" class="stat-value">60s</div>
+        <div id="timer" class="stat-value">100s</div>
       </div>
       <div class="stat-box">
         <div class="stat-title">✨ 점수</div>
@@ -448,16 +448,16 @@
       ]
     };
 
-    // 명도 95% 수준의 초미세 은은한 파스텔 톤 팔레트 (눈으로는 색 구분 미비함)
+    // 명도 95% 수준의 초미세 은은한 파스텔 톤 팔레트
     const WORD_COLORS = [
-      "#FCF4F4", // 초미세 은은한 핑크
-      "#FCF6F0", // 초미세 은은한 베이지
-      "#FCFBF0", // 초미세 은은한 연노랑
-      "#F2FAF3", // 초미세 은은한 연두
-      "#F2FAF8", // 초미세 은은한 민트
-      "#F1F6FC", // 초미세 은은한 하늘
-      "#F7F2FC", // 초미세 은은한 라벤더
-      "#FCF2F7"  // 초미세 은은한 로즈
+      "#FCF4F4",
+      "#FCF6F0",
+      "#FCFBF0",
+      "#F2FAF3",
+      "#F2FAF8",
+      "#F1F6FC",
+      "#F7F2FC",
+      "#FCF2F7"
     ];
     
     const MASCOTS = ["🐻‍❄️", "🐰", "🐱", "🐻", "🐥", "🦊", "🦄", "🐶", "🐼"];
@@ -468,7 +468,7 @@
     let board = [];
     let selectedTile = null;
     let score = 0;
-    let timeLeft = 60;
+    let timeLeft = 100;
     let timerInterval = null;
     let isProcessing = false;
 
@@ -762,11 +762,11 @@
 
     function resetGame() {
       score = 0;
-      timeLeft = 60;
+      timeLeft = 100;
       selectedTile = null;
       isProcessing = false;
       document.getElementById('score').innerText = '0';
-      document.getElementById('timer').innerText = '60s';
+      document.getElementById('timer').innerText = '100s';
       document.getElementById('gameOverModal').classList.remove('show');
       initBoard();
       startTimer();
