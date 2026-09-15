@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>중국어 회화 단어 애니팡 </title>
+  <title>고등 중국어 단원별 애니팡</title>
   <style>
     * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
     body {
@@ -26,7 +26,6 @@
       align-items: center;
     }
     
-    /* 단원 선택 드롭다운 */
     .lesson-selector-box {
       width: 100%;
       margin-bottom: 10px;
@@ -106,7 +105,7 @@
       z-index: 10;
       box-shadow: 0 0 15px #FFFFFF;
     }
-    .tile-hanzi { font-size: 17px; line-height: 1.1; margin-bottom: 2px; }
+    .tile-hanzi { font-size: 16px; line-height: 1.1; margin-bottom: 2px; }
     .tile-pinyin { font-size: 9px; opacity: 0.9; font-weight: normal; }
 
     .modal {
@@ -149,13 +148,14 @@
 </head>
 <body>
   <div class="game-container">
-    <!-- 단원 선택 메뉴 -->
     <div class="lesson-selector-box">
       <select id="lessonSelect" class="lesson-select" onchange="changeLesson()">
-        <option value="1단원-본문1">📖 1단원 회화 본문 1</option>
-        <option value="1단원-본문2">📖 1단원 회화 본문 2</option>
-        <option value="2단원-본문1">📖 2단원 회화 본문 1</option>
-        <option value="2단원-본문2">📖 2단원 회화 본문 2</option>
+        <option value="1단원-회화1">📖 1단원 회화 1</option>
+        <option value="1단원-회화2">📖 1단원 회화 2</option>
+        <option value="1단원-추가">➕ 1단원 추가 단어</option>
+        <option value="2단원-회화1">📖 2단원 회화 1</option>
+        <option value="2단원-회화2">📖 2단원 회화 2</option>
+        <option value="2단원-추가">➕ 2단원 추가 단어</option>
         <option value="전체">📚 1~2단원 전체 통합</option>
       </select>
     </div>
@@ -189,48 +189,114 @@
   </div>
 
   <script>
-    // ==========================================
-    // 💡 [교사 전용] 단원별 단어 수정 구역
-    // 필요에 따라 한자, 발음, 뜻을 변경/추가하세요!
-    // ==========================================
+    // 단원별 단어 데이터 구역 (수정 가능)
     const LESSON_DATA = {
-      "1단원-본문1": [
-        { hanzi: "你好", pinyin: "nǐ hǎo", meaning: "안녕하세요" },
-        { hanzi: "再见", pinyin: "zàijiàn", meaning: "안녕히 가세요" },
-        { hanzi: "谢谢", pinyin: "xièxie", meaning: "감사합니다" },
-        { hanzi: "不客气", pinyin: "bú kèqi", meaning: "천만에요" },
-        { hanzi: "对不起", pinyin: "duìbuqǐ", meaning: "미안합니다" },
-        { hanzi: "没关系", pinyin: "méi guānxi", meaning: "괜찮습니다" }
-      ],
-      "1단원-본문2": [
+      "1단원-회화1": [
         { hanzi: "好久", pinyin: "hǎojiǔ", meaning: "오랫동안" },
-        { hanzi: "暑假", pinyin: "shǔjià", meaning: "여름방학" },
-        { hanzi: "高兴", pinyin: "gāoxìng", meaning: "기쁘다" },
-        { hanzi: "认识", pinyin: "rènshi", meaning: "알게 되다" },
-        { hanzi: "名字", pinyin: "míngzi", meaning: "이름" },
-        { hanzi: "什么", pinyin: "shénme", meaning: "무엇" }
-      ],
-      "2단원-본문1": [
+        { hanzi: "不见", pinyin: "bújiàn", meaning: "만나지 않다" },
+        { hanzi: "暑假", pinyin: "shǔjià", meaning: "여름 방학" },
+        { hanzi: "过", pinyin: "guò", meaning: "지내다" },
+        { hanzi: "得", pinyin: "de", meaning: "정도 연결" },
+        { hanzi: "怎么样", pinyin: "zěnmeyàng", meaning: "어떠하다" },
+        { hanzi: "每", pinyin: "měi", meaning: "매, ~마다" },
+        { hanzi: "天", pinyin: "tiān", meaning: "날, 일" },
+        { hanzi: "看", pinyin: "kàn", meaning: "보다" },
+        { hanzi: "书", pinyin: "shū", meaning: "책" },
         { hanzi: "运动", pinyin: "yùndòng", meaning: "운동하다" },
-        { hanzi: "加油", pinyin: "jiāyóu", meaning: "파이팅" },
-        { hanzi: "喜欢", pinyin: "xǐhuan", meaning: "좋아하다" },
-        { hanzi: "踢足球", pinyin: "tī zúqiú", meaning: "축구하다" },
-        { hanzi: "打篮球", pinyin: "dǎ lánqiú", meaning: "농구하다" },
-        { hanzi: "游泳", pinyin: "yóuyǒng", meaning: "수영하다" }
+        { hanzi: "非常", pinyin: "fēicháng", meaning: "매우, 대단히" }
       ],
-      "2단원-본문2": [
+      "1단원-회화2": [
+        { hanzi: "到", pinyin: "dào", meaning: "도달하다" },
+        { hanzi: "同学", pinyin: "tóngxué", meaning: "학우" },
+        { hanzi: "真", pinyin: "zhēn", meaning: "정말로" },
+        { hanzi: "高兴", pinyin: "gāoxìng", meaning: "기쁘다" },
+        { hanzi: "觉得", pinyin: "juéde", meaning: "~라고 느끼다" },
+        { hanzi: "学期", pinyin: "xuéqī", meaning: "학기" },
+        { hanzi: "努力", pinyin: "nǔlì", meaning: "열심히" },
+        { hanzi: "学习", pinyin: "xuéxí", meaning: "공부하다" },
+        { hanzi: "一起", pinyin: "yìqǐ", meaning: "함께" },
+        { hanzi: "加油", pinyin: "jiāyóu", meaning: "힘을 내다" }
+      ],
+      "1단원-추가": [
+        { hanzi: "熊猫", pinyin: "xióngmāo", meaning: "판다" },
+        { hanzi: "吃", pinyin: "chī", meaning: "먹다" },
+        { hanzi: "多", pinyin: "duō", meaning: "많다" },
+        { hanzi: "玩儿", pinyin: "wánr", meaning: "놀다" },
+        { hanzi: "开心", pinyin: "kāixīn", meaning: "즐겁다" },
+        { hanzi: "收", pinyin: "shōu", meaning: "받다" },
+        { hanzi: "个", pinyin: "ge", meaning: "개 (단위)" },
+        { hanzi: "礼物", pinyin: "lǐwù", meaning: "선물" },
+        { hanzi: "相信", pinyin: "xiāngxìn", meaning: "믿다" },
+        { hanzi: "能", pinyin: "néng", meaning: "~할 수 있다" },
+        { hanzi: "做", pinyin: "zuò", meaning: "하다" },
+        { hanzi: "昨天", pinyin: "zuótiān", meaning: "어제" },
+        { hanzi: "没", pinyin: "méi", meaning: "~않다" },
+        { hanzi: "不错", pinyin: "búcuò", meaning: "좋다" },
+        { hanzi: "还", pinyin: "hái", meaning: "그런대로" },
+        { hanzi: "行", pinyin: "xíng", meaning: "괜찮다" },
+        { hanzi: "不怎么样", pinyin: "bù zěnmeyàng", meaning: "별로 좋지 않다" },
+        { hanzi: "有意思", pinyin: "yǒu yìsi", meaning: "재미있다" },
+        { hanzi: "紧张", pinyin: "jǐnzhāng", meaning: "긴장하다" },
+        { hanzi: "太", pinyin: "tài", meaning: "너무" },
+        { hanzi: "可惜", pinyin: "kěxī", meaning: "아깝다" }
+      ],
+      "2단원-회화1": [
+        { hanzi: "想", pinyin: "xiǎng", meaning: "~하고 싶다" },
+        { hanzi: "参加", pinyin: "cānjiā", meaning: "참가하다" },
+        { hanzi: "什么", pinyin: "shénme", meaning: "무슨, 무엇" },
+        { hanzi: "社团", pinyin: "shètuán", meaning: "동아리" },
+        { hanzi: "电影", pinyin: "diànyǐng", meaning: "영화" },
+        { hanzi: "呢", pinyin: "ne", meaning: "~는요" },
         { hanzi: "音乐", pinyin: "yīnyuè", meaning: "음악" },
+        { hanzi: "喜欢", pinyin: "xǐhuan", meaning: "좋아하다" },
+        { hanzi: "弹", pinyin: "tán", meaning: "연주하다" },
         { hanzi: "钢琴", pinyin: "gāngqín", meaning: "피아노" },
-        { hanzi: "报名", pinyin: "bàomíng", meaning: "신청하다" },
-        { hanzi: "唱歌", pinyin: "chànggē", meaning: "노래하다" },
-        { hanzi: "跳舞", pinyin: "tiàowǔ", meaning: "춤추다" },
-        { hanzi: "听", pinyin: "tīng", meaning: "듣다" }
+        { hanzi: "报名", pinyin: "bàomíng", meaning: "신청하다" }
+      ],
+      "2단원-회화2": [
+        { hanzi: "欢迎", pinyin: "huānyíng", meaning: "환영하다" },
+        { hanzi: "条件", pinyin: "tiáojiàn", meaning: "조건" },
+        { hanzi: "只要", pinyin: "zhǐyào", meaning: "~하기만 하면" },
+        { hanzi: "快", pinyin: "kuài", meaning: "빨리" },
+        { hanzi: "时间", pinyin: "shíjiān", meaning: "시간" },
+        { hanzi: "从", pinyin: "cóng", meaning: "~부터" },
+        { hanzi: "到", pinyin: "dào", meaning: "~까지" },
+        { hanzi: "联系", pinyin: "liánxì", meaning: "연락하다" },
+        { hanzi: "方式", pinyin: "fāngshì", meaning: "방식" },
+        { hanzi: "加入", pinyin: "jiārù", meaning: "가입하다" },
+        { hanzi: "生活", pinyin: "shēnghuó", meaning: "생활" },
+        { hanzi: "会", pinyin: "huì", meaning: "~할 것이다" },
+        { hanzi: "更", pinyin: "gèng", meaning: "더욱" },
+        { hanzi: "精彩", pinyin: "jīngcǎi", meaning: "근사하다" }
+      ],
+      "2단원-추가": [
+        { hanzi: "周末", pinyin: "zhōumò", meaning: "주말" },
+        { hanzi: "韩国", pinyin: "Hánguó", meaning: "한국" },
+        { hanzi: "足球", pinyin: "zúqiú", meaning: "축구" },
+        { hanzi: "比赛", pinyin: "bǐsài", meaning: "경기" },
+        { hanzi: "有", pinyin: "yǒu", meaning: "있다" },
+        { hanzi: "打", pinyin: "dǎ", meaning: "치다" },
+        { hanzi: "篮球", pinyin: "lánqiú", meaning: "농구" },
+        { hanzi: "愿意", pinyin: "yuànyì", meaning: "원하다" },
+        { hanzi: "可以", pinyin: "kěyǐ", meaning: "~해도 된다" },
+        { hanzi: "科学", pinyin: "kēxué", meaning: "과학" },
+        { hanzi: "实验", pinyin: "shíyàn", meaning: "실험" },
+        { hanzi: "动漫", pinyin: "dòngmàn", meaning: "애니메이션" },
+        { hanzi: "画", pinyin: "huà", meaning: "그리다" },
+        { hanzi: "画儿", pinyin: "huàr", meaning: "그림" },
+        { hanzi: "体育", pinyin: "tǐyù", meaning: "체육" },
+        { hanzi: "乒乓球", pinyin: "pīngpāngqiú", meaning: "탁구" },
+        { hanzi: "努力", pinyin: "nǔlì", meaning: "노력하다" },
+        { hanzi: "成功", pinyin: "chénggōng", meaning: "성공하다" },
+        { hanzi: "问题", pinyin: "wèntí", meaning: "질문, 문제" },
+        { hanzi: "找", pinyin: "zhǎo", meaning: "찾다" },
+        { hanzi: "天气", pinyin: "tiānqì", meaning: "날씨" },
+        { hanzi: "出去", pinyin: "chūqu", meaning: "나가다" },
+        { hanzi: "拍照", pinyin: "pāizhào", meaning: "사진을 찍다" }
       ]
     };
 
-    // 타일 배경 색상 (자동 할당)
     const TILE_COLORS = ["#EF4444", "#10B981", "#F59E0B", "#3B82F6", "#8B5CF6", "#EC4899", "#06B6D4", "#84CC16"];
-
     const BOARD_SIZE = 6;
     let currentWords = [];
     let board = [];
@@ -240,7 +306,6 @@
     let timerInterval = null;
     let isProcessing = false;
 
-    // 현재 선택된 단원 데이터 로드 및 초기화
     function loadWordList() {
       const selectedKey = document.getElementById('lessonSelect').value;
       let rawList = [];
@@ -251,7 +316,6 @@
         rawList = LESSON_DATA[selectedKey] || [];
       }
 
-      // ID 및 색상 고유 지정
       currentWords = rawList.map((item, idx) => ({
         ...item,
         id: idx,
