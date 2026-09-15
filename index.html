@@ -157,7 +157,7 @@
       text-align: center;
       word-break: keep-all;
       position: relative;
-      border: 1px solid rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.9);
     }
     .tile:active {
       transform: scale(0.92);
@@ -474,11 +474,16 @@
       ]
     };
 
+    const WORD_COLORS = [
+      "#FCF4F4", "#FCF6F0", "#FCFBF0", "#F2FAF3",
+      "#F2FAF8", "#F1F6FC", "#F7F2FC", "#FCF2F7"
+    ];
+    
     const MASCOTS = ["🐻‍❄️", "🐰", "🐱", "🐻", "🐥", "🦊", "🦄", "🐶", "🐼"];
     const BOARD_SIZE = 6;
     
     let currentUser = { id: "", name: "", lesson: "" };
-    let activeLessonWords = [];
+    let currentWords = [];
     let board = [];
     let selectedTile = null;
     let score = 0;
@@ -488,13 +493,6 @@
     
     let idleSeconds = 0;
     let hintPairs = null;
-    let spawnBuffer = [];
-
-    // 명도 92% 고정 파스텔톤 색상 생성기 (색상 시각 의존도 낮춤)
-    function getPastelColor() {
-      const hue = Math.floor(Math.random() * 360);
-      return `hsl(${hue}, 50%, 92%)`;
-    }
 
     function openStartModal() {
       document.getElementById('startModal').classList.add('show');
@@ -527,82 +525,49 @@
         rawList = LESSON_DATA[selectedKey] || [];
       }
 
-      // 무작위로 단어 순서 섞기
-      activeLessonWords = rawList.map((item, idx) => ({
-        ...item,
-        id: idx,
-        bg: getPastelColor() // 각 단어마다 명도 92%의 파스텔톤 부여
-      }));
+      let shuffled = [...rawList];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
 
-      activeLessonWords.sort(() => Math.random() - 0.5);
+      const MAX_ACTIVE = Math.min(8, shuffled.length);
+      currentWords = shuffled.slice(0, MAX_ACTIVE).map((item, idx) => ({ ...item, id: idx, type: idx, isSelectable: true }));
     }
 
-    // 3장 1세트로 단어 카드 생성
-    function generateThreePack() {
-      if (activeLessonWords.length === 0) return [];
-      
-      const randWord = activeLessonWords[Math.floor(Math.random() * activeLessonWords.length)];
-      const pack = [];
-
-      for (let i = 0; i < 3; i++) {
-        const displayType = Math.random() < 0.5 ? 'hanzi' : 'meaning';
-        pack.push({
-          ...randWord,
-          displayType,
-          isBomb: false
-        });
-      }
-      return pack;
-    }
-
-    // 보드 타일 신규 리필용 객체 가져오기
-    function getNextTileInstance() {
-      // 5% 확률로 폭탄 생성
-      if (Math.random() < 0.05) {
-        return { isBomb: true, id: -999, bg: '#FFF0F0' };
+    function getRandomTileInstance(allowBomb = false) {
+      if (allowBomb && Math.random() < 0.05) {
+        return { isBomb: true, id: -999, type: -999, isSelectable: true, bg: '#FFF0F0' };
       }
 
-      if (spawnBuffer.length === 0) {
-        spawnBuffer = generateThreePack();
-      }
-      return spawnBuffer.pop();
+      const randWord = currentWords[Math.floor(Math.random() * currentWords.length)];
+      const displayType = Math.random() < 0.5 ? 'hanzi' : 'meaning';
+      const fixedColor = WORD_COLORS[randWord.id % WORD_COLORS.length];
+      return { ...randWord, displayType, bg: fixedColor, isBomb: false, isSelectable: true };
     }
 
     function initBoard() {
       loadWordList();
-      spawnBuffer = [];
+      const boardEl = document.getElementById('board');
+      boardEl.innerHTML = '';
+      board = [];
 
-      let validBoardCreated = false;
-      let attempts = 0;
-
-      while (!validBoardCreated && attempts < 200) {
-        attempts++;
-        // 6x6=36개 타일 -> 반드시 12세트(36개)의 단어 세트 구성
-        let initialDeck = [];
-        for (let i = 0; i < 12; i++) {
-          initialDeck.push(...generateThreePack());
-        }
-        
-        // 덱 섞기
-        initialDeck.sort(() => Math.random() - 0.5);
-
-        // 보드 배치
-        board = [];
-        for (let r = 0; r < BOARD_SIZE; r++) {
-          board[r] = [];
-          for (let c = 0; c < BOARD_SIZE; c++) {
-            board[r][c] = initialDeck[r * BOARD_SIZE + c];
-          }
-        }
-
-        // 초기 시작 시 자동 터짐이 없고, 움직일 수 있는 매칭 조합이 존재하는지 확인
-        if (!checkMatches().hasMatch && hasValidMove()) {
-          validBoardCreated = true;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        board[r] = [];
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          let tileItem;
+          do {
+            tileItem = getRandomTileInstance(false);
+          } while (
+            (r >= 2 && board[r-1][c].id === tileItem.id && board[r-2][c].id === tileItem.id) ||
+            (c >= 2 && board[r][c-1].id === tileItem.id && board[r][c-2].id === tileItem.id)
+          );
+          board[r][c] = tileItem;
         }
       }
-
       clearHint();
       renderBoard();
+      checkGameState(board.flat());
     }
 
     function renderBoard() {
@@ -650,68 +615,6 @@
     function clearHint() {
       idleSeconds = 0;
       hintPairs = null;
-    }
-
-    // 움직일 수 있는 조합이 있는지 감지
-    function hasValidMove() {
-      // 보드 상에 폭탄이 있는 경우 감지
-      for (let r = 0; r < BOARD_SIZE; r++) {
-        for (let c = 0; c < BOARD_SIZE; c++) {
-          if (board[r][c] && board[r][c].isBomb) return true;
-        }
-      }
-
-      // 인접 타일 스왑을 통한 3개 연속 매칭 가능 여부 검사
-      for (let r = 0; r < BOARD_SIZE; r++) {
-        for (let c = 0; c < BOARD_SIZE; c++) {
-          if (c < BOARD_SIZE - 1) {
-            swapTiles(r, c, r, c + 1);
-            const matched = checkMatches().hasMatch;
-            swapTiles(r, c, r, c + 1);
-            if (matched) return true;
-          }
-          if (r < BOARD_SIZE - 1) {
-            swapTiles(r, c, r + 1, c);
-            const matched = checkMatches().hasMatch;
-            swapTiles(r, c, r + 1, c);
-            if (matched) return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    // 더 이상 매칭 가능한 조합이 없을 때 자동 섞기
-    function checkAndAutoShuffle() {
-      if (hasValidMove()) return;
-
-      document.getElementById('bannerHanzi').innerText = "🔀 자동 섞기!";
-      document.getElementById('bannerSub').innerText = "매칭할 단어가 없어 카드를 다시 섞습니다!";
-      document.getElementById('bannerMascot').innerText = "🎲";
-
-      let shuffleAttempts = 0;
-      while (!hasValidMove() && shuffleAttempts < 100) {
-        shuffleAttempts++;
-        let flatBoard = board.flat();
-        
-        // Fisher-Yates 섞기
-        for (let i = flatBoard.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [flatBoard[i], flatBoard[j]] = [flatBoard[j], flatBoard[i]];
-        }
-
-        for (let r = 0; r < BOARD_SIZE; r++) {
-          for (let c = 0; c < BOARD_SIZE; c++) {
-            board[r][c] = flatBoard[r * BOARD_SIZE + c];
-          }
-        }
-
-        // 섞은 결과가 즉시 완성되는 경우 방지
-        if (checkMatches().hasMatch) {
-          continue;
-        }
-      }
-      renderBoard();
     }
 
     function findAndShowHint() {
@@ -780,9 +683,8 @@
         if (!hasMatch) {
           swapTiles(r1, c1, r, c);
           renderBoard();
-        } else {
-          checkAndAutoShuffle();
         }
+        checkGameState(board.flat());
         isProcessing = false;
       } else {
         selectedTile = { r, c };
@@ -819,7 +721,7 @@
       await new Promise(res => setTimeout(res, 200));
 
       await processMatches();
-      checkAndAutoShuffle();
+      checkGameState(board.flat());
       isProcessing = false;
     }
 
@@ -908,7 +810,7 @@
           }
         }
         for (let r = emptyRow; r >= 0; r--) {
-          board[r][c] = getNextTileInstance();
+          board[r][c] = getRandomTileInstance(true);
         }
       }
     }
@@ -1011,6 +913,61 @@
           localStorage.removeItem('chineseGameScores');
         } catch(e) {}
         openLeaderboard();
+      }
+    }
+
+    // --- 새로 추가 및 통합된 매칭 검사 및 셔플 로직 ---
+
+    // 1. 현재 화면에서 3개 이상 매칭 가능한 카드가 있는지 검사
+    function hasValidMatch(currentCards) {
+      const cardCounts = {};
+      
+      // 오픈된(선택 가능한) 카드들의 종류별 개수 파악
+      currentCards.forEach(card => {
+        if (card && card.isSelectable && card.type !== undefined && card.type !== -999) {
+          cardCounts[card.type] = (cardCounts[card.type] || 0) + 1;
+        }
+      });
+
+      // 3개 이상 모일 수 있는 카드가 하나라도 있으면 true
+      return Object.values(cardCounts).some(count => count >= 3);
+    }
+
+    // 2. 카드 위치 재배치 (Fisher-Yates Shuffle)
+    function shuffleCards(cards) {
+      for (let i = cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cards[i], cards[j]] = [cards[j], cards[i]];
+      }
+    }
+
+    // 3. 턴이 끝날 때마다 상태 확인 및 자동 섞기 실행
+    function checkGameState(boardCards) {
+      // 남은 카드가 있고, 더 이상 3개 매칭할 수 있는 조합이 없는 경우
+      if (boardCards.length > 0 && !hasValidMatch(boardCards)) {
+        console.log("매칭 가능한 카드가 없습니다. 카드를 다시 섞습니다.");
+        
+        let validBoardCards = boardCards.filter(card => card !== null);
+        shuffleCards(validBoardCards);
+        
+        // 섞인 카드를 보드 2D 배열로 다시 재배치
+        let idx = 0;
+        for (let r = 0; r < BOARD_SIZE; r++) {
+          for (let c = 0; c < BOARD_SIZE; c++) {
+            if (idx < validBoardCards.length) {
+              board[r][c] = validBoardCards[idx++];
+            } else {
+              board[r][c] = getRandomTileInstance(true);
+            }
+          }
+        }
+
+        document.getElementById('bannerHanzi').innerText = "🔀 카드 자동 재배치!";
+        document.getElementById('bannerSub').innerText = "매칭 가능한 수가 없어 카드를 새로 섞었습니다.";
+        document.getElementById('bannerMascot').innerText = "🎲";
+
+        renderBoard();
+        processMatches();
       }
     }
   </script>
