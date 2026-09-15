@@ -301,7 +301,7 @@
       <div class="banner-mascot" id="bannerMascot">🐻‍❄️</div>
       <div class="banner-content">
         <div id="bannerHanzi" class="banner-hanzi">중국어회화 단어 매칭</div>
-        <div id="bannerSub" class="banner-sub">한자와 뜻을 연결해 3개를 매칭하세요!</div>
+        <div id="bannerSub" class="banner-sub">상하좌우/대각선 카드를 옮겨 3개를 맞추세요!</div>
       </div>
     </div>
 
@@ -645,17 +645,18 @@
     function hasAnyPossibleMatch() {
       for (let r = 0; r < BOARD_SIZE; r++) {
         for (let c = 0; c < BOARD_SIZE; c++) {
-          if (c < BOARD_SIZE - 1) {
-            swapTiles(r, c, r, c + 1);
-            const res = checkMatches().hasMatch;
-            swapTiles(r, c, r, c + 1);
-            if (res) return true;
-          }
-          if (r < BOARD_SIZE - 1) {
-            swapTiles(r, c, r + 1, c);
-            const res = checkMatches().hasMatch;
-            swapTiles(r, c, r + 1, c);
-            if (res) return true;
+          // 8방향(대각선 포함) 매칭 가능 여부 확인
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              if (dr === 0 && dc === 0) continue;
+              const nr = r + dr, nc = c + dc;
+              if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) {
+                swapTiles(r, c, nr, nc);
+                const res = checkMatches().hasMatch;
+                swapTiles(r, c, nr, nc);
+                if (res) return true;
+              }
+            }
           }
         }
       }
@@ -667,32 +668,24 @@
 
       for (let r = 0; r < BOARD_SIZE; r++) {
         for (let c = 0; c < BOARD_SIZE; c++) {
-          if (c < BOARD_SIZE - 1) {
-            swapTiles(r, c, r, c + 1);
-            if (checkMatches().hasMatch) {
-              swapTiles(r, c, r, c + 1);
-              hintPairs = [{r, c}, {r, c: c + 1}];
-              document.getElementById('bannerHanzi').innerText = "💡 힌트 전달!";
-              document.getElementById('bannerSub').innerText = "반짝이는 두 카드의 위치를 바꿔보세요!";
-              document.getElementById('bannerMascot').innerText = "✨";
-              renderBoard();
-              return;
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              if (dr === 0 && dc === 0) continue;
+              const nr = r + dr, nc = c + dc;
+              if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) {
+                swapTiles(r, c, nr, nc);
+                if (checkMatches().hasMatch) {
+                  swapTiles(r, c, nr, nc);
+                  hintPairs = [{r, c}, {r: nr, c: nc}];
+                  document.getElementById('bannerHanzi').innerText = "💡 힌트 전달!";
+                  document.getElementById('bannerSub').innerText = "반짝이는 두 카드의 위치를 바꿔보세요!";
+                  document.getElementById('bannerMascot').innerText = "✨";
+                  renderBoard();
+                  return;
+                }
+                swapTiles(r, c, nr, nc);
+              }
             }
-            swapTiles(r, c, r, c + 1);
-          }
-
-          if (r < BOARD_SIZE - 1) {
-            swapTiles(r, c, r + 1, c);
-            if (checkMatches().hasMatch) {
-              swapTiles(r, c, r + 1, c);
-              hintPairs = [{r, c}, {r: r + 1, c}];
-              document.getElementById('bannerHanzi').innerText = "💡 힌트 전달!";
-              document.getElementById('bannerSub').innerText = "반짝이는 두 카드의 위치를 바꿔보세요!";
-              document.getElementById('bannerMascot').innerText = "✨";
-              renderBoard();
-              return;
-            }
-            swapTiles(r, c, r + 1, c);
           }
         }
       }
@@ -724,7 +717,11 @@
       }
 
       const r1 = selectedTile.r, c1 = selectedTile.c;
-      const isAdjacent = (Math.abs(r1 - r) + Math.abs(c1 - c)) === 1;
+      const dr = Math.abs(r1 - r);
+      const dc = Math.abs(c1 - c);
+      
+      // 상하좌우 및 대각선(거리 1 이내) 인접 여부 체크
+      const isAdjacent = (dr <= 1 && dc <= 1) && !(dr === 0 && dc === 0);
 
       if (isAdjacent) {
         isProcessing = true;
