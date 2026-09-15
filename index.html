@@ -645,7 +645,6 @@
     function hasAnyPossibleMatch() {
       for (let r = 0; r < BOARD_SIZE; r++) {
         for (let c = 0; c < BOARD_SIZE; c++) {
-          // 8방향(대각선 포함) 매칭 가능 여부 확인
           for (let dr = -1; dr <= 1; dr++) {
             for (let dc = -1; dc <= 1; dc++) {
               if (dr === 0 && dc === 0) continue;
@@ -720,7 +719,6 @@
       const dr = Math.abs(r1 - r);
       const dc = Math.abs(c1 - c);
       
-      // 상하좌우 및 대각선(거리 1 이내) 인접 여부 체크
       const isAdjacent = (dr <= 1 && dc <= 1) && !(dr === 0 && dc === 0);
 
       if (isAdjacent) {
@@ -755,9 +753,7 @@
         }
       }
 
-      score += clearedCount * 150;
-      document.getElementById('score').innerText = score;
-
+      // 점수 추가 삭제 (특수 카드 자체 점수 없음)
       document.getElementById('bannerHanzi').innerText = "💥 폭탄 팡!";
       document.getElementById('bannerSub').innerText = `주위 ${clearedCount}개 단어가 사라졌습니다!`;
       document.getElementById('bannerMascot').innerText = "💣";
@@ -776,8 +772,7 @@
     async function triggerMagicShuffle() {
       isProcessing = true;
       selectedTile = null;
-      score += 300;
-      document.getElementById('score').innerText = score;
+      // 점수 추가 삭제 (특수 카드 자체 점수 없음)
 
       document.getElementById('bannerHanzi').innerText = "🎲 마법 셔플!";
       document.getElementById('bannerSub').innerText = "카드가 새롭게 완전히 재배치됩니다!";
@@ -803,9 +798,7 @@
         if (board[i][centerC]) { board[i][centerC] = null; clearedCount++; }
       }
 
-      score += clearedCount * 100;
-      document.getElementById('score').innerText = score;
-
+      // 점수 추가 삭제 (특수 카드 자체 점수 없음)
       document.getElementById('bannerHanzi').innerText = "⭐ 시간 연장 팡!";
       document.getElementById('bannerSub').innerText = "남은 시간 +10초 및 십자 카드가 폭파되었습니다!";
       document.getElementById('bannerMascot').innerText = "⏰";
@@ -958,7 +951,6 @@
         idleSeconds++;
         document.getElementById('timer').innerText = `${timeLeft}s`;
 
-        // 💡 10초간 입력이 없을 때 힌트 제공
         if (idleSeconds >= 10) {
           findAndShowHint();
         }
