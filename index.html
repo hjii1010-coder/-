@@ -2,134 +2,466 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>단어 게임</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>고등 중국어 단원별 애니팡</title>
   <style>
-    body { font-family: 'Pretendard', sans-serif; background: #f0f4f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
-    .card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
-    h1 { color: #1E293B; margin-top: 0; font-size: 24px; }
-    select, button { padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #cbd5e1; margin: 8px 0; width: 100%; box-sizing: border-box; }
-    button { background: #4F46E5; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    button:hover { background: #4338CA; }
-    .quiz-box { margin-top: 20px; display: none; }
-    .word-display { font-size: 30px; font-weight: bold; margin: 20px 0; color: #0F172A; }
-    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-    .option-btn { background: #F1F5F9; color: #334155; border: 1px solid #CBD5E1; }
-    .option-btn:hover { background: #E2E8F0; }
-    .score { font-size: 18px; font-weight: bold; color: #059669; }
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+      background: #111827;
+      color: #FFFFFF;
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .game-container {
+      width: 100%;
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    /* 단원 선택 드롭다운 */
+    .lesson-selector-box {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .lesson-select {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 15px;
+      font-weight: bold;
+      background: #374151;
+      color: #FBBF24;
+      border: 2px solid #4F46E5;
+      border-radius: 12px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1F2937;
+      padding: 12px 20px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #374151;
+    }
+    .stat-box { text-align: center; }
+    .stat-title { font-size: 12px; color: #9CA3AF; margin-bottom: 2px; }
+    .stat-value { font-size: 22px; font-weight: 800; color: #F59E0B; }
+
+    .card-banner {
+      width: 100%;
+      height: 64px;
+      background: #374151;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      border: 2px solid #6366F1;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    }
+    .banner-hanzi { font-size: 24px; font-weight: 800; color: #60A5FA; }
+    .banner-pinyin { font-size: 15px; color: #34D399; font-weight: 600; }
+    .banner-meaning { font-size: 14px; color: #FBBF24; font-weight: 700; }
+
+    .grid-board {
+      width: 100%;
+      aspect-ratio: 1;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      background: #1F2937;
+      padding: 8px;
+      border-radius: 20px;
+      border: 2px solid #374151;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+    .tile {
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.2s;
+      box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+    }
+    .tile:active { transform: scale(0.92); }
+    .tile.selected {
+      outline: 4px solid #FFFFFF;
+      transform: scale(1.06);
+      z-index: 10;
+      box-shadow: 0 0 15px #FFFFFF;
+    }
+    .tile-hanzi { font-size: 17px; line-height: 1.1; margin-bottom: 2px; }
+    .tile-pinyin { font-size: 9px; opacity: 0.9; font-weight: normal; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal.show { opacity: 1; pointer-events: auto; }
+    .modal-box {
+      background: #1F2937;
+      padding: 32px 24px;
+      border-radius: 24px;
+      text-align: center;
+      width: 88%;
+      max-width: 340px;
+      border: 2px solid #6366F1;
+    }
+    .modal-title { font-size: 26px; font-weight: 800; color: #F59E0B; margin-bottom: 12px; }
+    .modal-score { font-size: 18px; margin-bottom: 24px; color: #E5E7EB; }
+    .btn-action {
+      background: #4F46E5;
+      color: white;
+      border: none;
+      padding: 14px;
+      font-size: 17px;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .btn-action:active { transform: scale(0.96); background: #4338CA; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>📚 영어 단어 퀴즈 게임</h1>
-    
-    <label for="unitSelect" style="font-weight:bold; display:block; text-align:left; margin-bottom:4px;">단원 선택</label>
-    <select id="unitSelect">
-      <option value="unit1_1">1단원 - 회화 본문 1</option>
-      <option value="unit1_2">1단원 - 회화 본문 2</option>
-      <option value="unit2_1">2단원 - 회화 본문 1</option>
-      <option value="unit2_2">2단원 - 회화 본문 2</option>
-    </select>
+  <div class="game-container">
+    <!-- 단원 선택 메뉴 -->
+    <div class="lesson-selector-box">
+      <select id="lessonSelect" class="lesson-select" onchange="changeLesson()">
+        <option value="1단원-본문1">📖 1단원 회화 본문 1</option>
+        <option value="1단원-본문2">📖 1단원 회화 본문 2</option>
+        <option value="2단원-본문1">📖 2단원 회화 본문 1</option>
+        <option value="2단원-본문2">📖 2단원 회화 본문 2</option>
+        <option value="전체">📚 1~2단원 전체 통합</option>
+      </select>
+    </div>
 
-    <button onclick="startGame()">게임 시작하기 🚀</button>
+    <div class="header">
+      <div class="stat-box">
+        <div class="stat-title">남은 시간</div>
+        <div id="timer" class="stat-value">60s</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-title">현재 점수</div>
+        <div id="score" class="stat-value">0</div>
+      </div>
+    </div>
 
-    <div id="quizBox" class="quiz-box">
-      <div id="score" class="score">점수: 0</div>
-      <div id="wordDisplay" class="word-display">Word</div>
-      <div id="options" class="options-grid"></div>
+    <div class="card-banner">
+      <div id="bannerHanzi" class="banner-hanzi">중국어</div>
+      <div id="bannerPinyin" class="banner-pinyin">Anipang</div>
+      <div id="bannerMeaning" class="banner-meaning">3개를 맞추세요!</div>
+    </div>
+
+    <div id="board" class="grid-board"></div>
+  </div>
+
+  <div id="gameOverModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-title">🎉 시간 종료!</div>
+      <div id="finalScore" class="modal-score">최종 점수: 0점</div>
+      <button class="btn-action" onclick="resetGame()">다시 도전하기 🚀</button>
     </div>
   </div>
 
   <script>
-    /* =========================================================
-       💡 [선생님 수정 구역]
-       아래 단어와 뜻을 본문 내용에 맞게 자유롭게 수정/추가하세요!
-    ========================================================= */
-    const wordData = {
-      "unit1_1": [
-        { word: "Hello", meaning: "안녕하세요" },
-        { word: "Nice to meet you", meaning: "만나서 반가워요" },
-        { word: "Name", meaning: "이름" }
+    // ==========================================
+    // 💡 [교사 전용] 단원별 단어 수정 구역
+    // 필요에 따라 한자, 발음, 뜻을 변경/추가하세요!
+    // ==========================================
+    const LESSON_DATA = {
+      "1단원-본문1": [
+        { hanzi: "你好", pinyin: "nǐ hǎo", meaning: "안녕하세요" },
+        { hanzi: "再见", pinyin: "zàijiàn", meaning: "안녕히 가세요" },
+        { hanzi: "谢谢", pinyin: "xièxie", meaning: "감사합니다" },
+        { hanzi: "不客气", pinyin: "bú kèqi", meaning: "천만에요" },
+        { hanzi: "对不起", pinyin: "duìbuqǐ", meaning: "미안합니다" },
+        { hanzi: "没关系", pinyin: "méi guānxi", meaning: "괜찮습니다" }
       ],
-      "unit1_2": [
-        { word: "Where", meaning: "어디" },
-        { word: "Student", meaning: "학생" },
-        { word: "Friend", meaning: "친구" }
+      "1단원-본문2": [
+        { hanzi: "好久", pinyin: "hǎojiǔ", meaning: "오랫동안" },
+        { hanzi: "暑假", pinyin: "shǔjià", meaning: "여름방학" },
+        { hanzi: "高兴", pinyin: "gāoxìng", meaning: "기쁘다" },
+        { hanzi: "认识", pinyin: "rènshi", meaning: "알게 되다" },
+        { hanzi: "名字", pinyin: "míngzi", meaning: "이름" },
+        { hanzi: "什么", pinyin: "shénme", meaning: "무엇" }
       ],
-      "unit2_1": [
-        { word: "Hobby", meaning: "취미" },
-        { word: "Music", meaning: "음악" },
-        { word: "Sports", meaning: "운동" }
+      "2단원-본문1": [
+        { hanzi: "运动", pinyin: "yùndòng", meaning: "운동하다" },
+        { hanzi: "加油", pinyin: "jiāyóu", meaning: "파이팅" },
+        { hanzi: "喜欢", pinyin: "xǐhuan", meaning: "좋아하다" },
+        { hanzi: "踢足球", pinyin: "tī zúqiú", meaning: "축구하다" },
+        { hanzi: "打篮球", pinyin: "dǎ lánqiú", meaning: "농구하다" },
+        { hanzi: "游泳", pinyin: "yóuyǒng", meaning: "수영하다" }
       ],
-      "unit2_2": [
-        { word: "Tomorrow", meaning: "내일" },
-        { word: "Time", meaning: "시간" },
-        { word: "Together", meaning: "함께" }
+      "2단원-본문2": [
+        { hanzi: "音乐", pinyin: "yīnyuè", meaning: "음악" },
+        { hanzi: "钢琴", pinyin: "gāngqín", meaning: "피아노" },
+        { hanzi: "报名", pinyin: "bàomíng", meaning: "신청하다" },
+        { hanzi: "唱歌", pinyin: "chànggē", meaning: "노래하다" },
+        { hanzi: "跳舞", pinyin: "tiàowǔ", meaning: "춤추다" },
+        { hanzi: "听", pinyin: "tīng", meaning: "듣다" }
       ]
     };
 
+    // 타일 배경 색상 (자동 할당)
+    const TILE_COLORS = ["#EF4444", "#10B981", "#F59E0B", "#3B82F6", "#8B5CF6", "#EC4899", "#06B6D4", "#84CC16"];
+
+    const BOARD_SIZE = 6;
     let currentWords = [];
-    let currentIndex = 0;
+    let board = [];
+    let selectedTile = null;
     let score = 0;
+    let timeLeft = 60;
+    let timerInterval = null;
+    let isProcessing = false;
 
-    function startGame() {
-      const unitKey = document.getElementById('unitSelect').value;
-      currentWords = [...wordData[unitKey]];
-      
-      if (!currentWords || currentWords.length === 0) {
-        alert('이 단원에 등록된 단어가 없습니다.');
-        return;
-      }
+    // 현재 선택된 단원 데이터 로드 및 초기화
+    function loadWordList() {
+      const selectedKey = document.getElementById('lessonSelect').value;
+      let rawList = [];
 
-      currentWords.sort(() => Math.random() - 0.5); // 단어 무작위 섞기
-      currentIndex = 0;
-      score = 0;
-      document.getElementById('quizBox').style.display = 'block';
-      updateScore();
-      nextQuestion();
-    }
-
-    function nextQuestion() {
-      if (currentIndex >= currentWords.length) {
-        alert(`🎉 축하합니다! 모든 문제를 풀었습니다.\n최종 점수: ${score}점`);
-        document.getElementById('quizBox').style.display = 'none';
-        return;
-      }
-
-      const currentWordObj = currentWords[currentIndex];
-      document.getElementById('wordDisplay').innerText = currentWordObj.word;
-
-      // 전체 단어 뜻 중에서 오답 보기 만들기
-      const allMeanings = Object.values(wordData).flat().map(w => w.meaning);
-      const wrongMeanings = allMeanings.filter(m => m !== currentWordObj.meaning).sort(() => Math.random() - 0.5);
-      const options = [currentWordObj.meaning, ...wrongMeanings.slice(0, 3)].sort(() => Math.random() - 0.5);
-
-      const optionsGrid = document.getElementById('options');
-      optionsGrid.innerHTML = '';
-      options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.innerText = opt;
-        btn.onclick = () => checkAnswer(opt, currentWordObj.meaning);
-        optionsGrid.appendChild(btn);
-      });
-    }
-
-    function checkAnswer(selected, correct) {
-      if (selected === correct) {
-        score += 10;
-        alert('⭕ 정답입니다!');
+      if (selectedKey === "전체") {
+        Object.values(LESSON_DATA).forEach(list => rawList.push(...list));
       } else {
-        alert(`❌ 아쉽네요! 정답은 "${correct}" 입니다.`);
+        rawList = LESSON_DATA[selectedKey] || [];
       }
-      updateScore();
-      currentIndex++;
-      nextQuestion();
+
+      // ID 및 색상 고유 지정
+      currentWords = rawList.map((item, idx) => ({
+        ...item,
+        id: idx,
+        bg: TILE_COLORS[idx % TILE_COLORS.length]
+      }));
     }
 
-    function updateScore() {
-      document.getElementById('score').innerText = `점수: ${score}점`;
+    function changeLesson() {
+      resetGame();
     }
+
+    function initBoard() {
+      loadWordList();
+      const boardEl = document.getElementById('board');
+      boardEl.innerHTML = '';
+      board = [];
+
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        board[r] = [];
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          let word;
+          do {
+            word = currentWords[Math.floor(Math.random() * currentWords.length)];
+          } while (
+            (r >= 2 && board[r-1][c].id === word.id && board[r-2][c].id === word.id) ||
+            (c >= 2 && board[r][c-1].id === word.id && board[r][c-2].id === word.id)
+          );
+          board[r][c] = { ...word };
+        }
+      }
+      renderBoard();
+    }
+
+    function renderBoard() {
+      const boardEl = document.getElementById('board');
+      boardEl.innerHTML = '';
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const item = board[r][c];
+          const tile = document.createElement('div');
+          tile.className = 'tile';
+          tile.style.backgroundColor = item ? item.bg : 'transparent';
+          if (selectedTile && selectedTile.r === r && selectedTile.c === c) {
+            tile.classList.add('selected');
+          }
+          if (item) {
+            tile.innerHTML = `
+              <div class="tile-hanzi">${item.hanzi}</div>
+              <div class="tile-pinyin">${item.pinyin}</div>
+            `;
+            tile.onclick = () => handleTileClick(r, c);
+          }
+          boardEl.appendChild(tile);
+        }
+      }
+    }
+
+    async function handleTileClick(r, c) {
+      if (isProcessing || timeLeft <= 0) return;
+
+      if (!selectedTile) {
+        selectedTile = { r, c };
+        renderBoard();
+        return;
+      }
+
+      const r1 = selectedTile.r, c1 = selectedTile.c;
+      const isAdjacent = (Math.abs(r1 - r) + Math.abs(c1 - c)) === 1;
+
+      if (isAdjacent) {
+        isProcessing = true;
+        swapTiles(r1, c1, r, c);
+        selectedTile = null;
+        renderBoard();
+
+        const hasMatch = await processMatches();
+        if (!hasMatch) {
+          swapTiles(r1, c1, r, c);
+          renderBoard();
+        }
+        isProcessing = false;
+      } else {
+        selectedTile = { r, c };
+        renderBoard();
+      }
+    }
+
+    function swapTiles(r1, c1, r2, c2) {
+      const temp = board[r1][c1];
+      board[r1][c1] = board[r2][c2];
+      board[r2][c2] = temp;
+    }
+
+    function checkMatches() {
+      let matched = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(false));
+      let hasMatch = false;
+
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE - 2; c++) {
+          let id = board[r][c]?.id;
+          if (id !== undefined && id === board[r][c+1]?.id && id === board[r][c+2]?.id) {
+            matched[r][c] = matched[r][c+1] = matched[r][c+2] = true;
+            hasMatch = true;
+          }
+        }
+      }
+
+      for (let c = 0; c < BOARD_SIZE; c++) {
+        for (let r = 0; r < BOARD_SIZE - 2; r++) {
+          let id = board[r][c]?.id;
+          if (id !== undefined && id === board[r+1][c]?.id && id === board[r+2][c]?.id) {
+            matched[r][c] = matched[r+1][c] = matched[r+2][c] = true;
+            hasMatch = true;
+          }
+        }
+      }
+      return { hasMatch, matched };
+    }
+
+    async function processMatches() {
+      let { hasMatch, matched } = checkMatches();
+      if (!hasMatch) return false;
+
+      let totalMatchedCount = 0;
+      let lastWord = null;
+
+      while (hasMatch) {
+        for (let r = 0; r < BOARD_SIZE; r++) {
+          for (let c = 0; c < BOARD_SIZE; c++) {
+            if (matched[r][c] && board[r][c]) {
+              lastWord = board[r][c];
+              board[r][c] = null;
+              totalMatchedCount++;
+            }
+          }
+        }
+
+        if (lastWord) {
+          document.getElementById('bannerHanzi').innerText = lastWord.hanzi;
+          document.getElementById('bannerPinyin').innerText = lastWord.pinyin;
+          document.getElementById('bannerMeaning').innerText = lastWord.meaning;
+        }
+
+        score += totalMatchedCount * 100;
+        document.getElementById('score').innerText = score;
+
+        renderBoard();
+        await new Promise(res => setTimeout(res, 200));
+
+        dropTiles();
+        renderBoard();
+        await new Promise(res => setTimeout(res, 200));
+
+        const res = checkMatches();
+        hasMatch = res.hasMatch;
+        matched = res.matched;
+      }
+      return true;
+    }
+
+    function dropTiles() {
+      for (let c = 0; c < BOARD_SIZE; c++) {
+        let emptyRow = BOARD_SIZE - 1;
+        for (let r = BOARD_SIZE - 1; r >= 0; r--) {
+          if (board[r][c] !== null) {
+            board[emptyRow][c] = board[r][c];
+            if (emptyRow !== r) board[r][c] = null;
+            emptyRow--;
+          }
+        }
+        for (let r = emptyRow; r >= 0; r--) {
+          const randWord = currentWords[Math.floor(Math.random() * currentWords.length)];
+          board[r][c] = { ...randWord };
+        }
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').innerText = `${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      document.getElementById('finalScore').innerText = `최종 점수: ${score}점`;
+      document.getElementById('gameOverModal').classList.add('show');
+    }
+
+    function resetGame() {
+      score = 0;
+      timeLeft = 60;
+      selectedTile = null;
+      isProcessing = false;
+      document.getElementById('score').innerText = '0';
+      document.getElementById('timer').innerText = '60s';
+      document.getElementById('gameOverModal').classList.remove('show');
+      initBoard();
+      startTimer();
+    }
+
+    window.onload = () => {
+      initBoard();
+      startTimer();
+    };
   </script>
 </body>
 </html>
