@@ -33,7 +33,7 @@
       50% { transform: scale(1.08); }
     }
 
-    /* 10초 힌트용 반짝임 애니메이션 */
+    /* 15초 힌트용 반짝임 애니메이션 */
     @keyframes hintPulse {
       0%, 100% { transform: scale(1); outline: 4px solid #FFD700; box-shadow: 0 0 15px #FFD700; }
       50% { transform: scale(1.08); outline: 4px solid #FF4500; box-shadow: 0 0 25px #FF4500; }
@@ -441,7 +441,7 @@
         { hanzi: "打", pinyin: "dǎ", meaning: "치다" },
         { hanzi: "篮球", pinyin: "lánqiú", meaning: "농구" },
         { hanzi: "愿意", pinyin: "yuànyì", meaning: "원하다" },
-        { hanzi: "可以", pinyin: "kěyǐ", meaning: "~해도 된다" },
+        { hanzi: " सकते", pinyin: "kěyǐ", meaning: "~해도 된다" },
         { hanzi: "科学", pinyin: "kēxué", meaning: "과학" },
         { hanzi: "实验", pinyin: "shíyàn", meaning: "실험" },
         { hanzi: "动漫", pinyin: "dòngmàn", meaning: "애니메이션" },
@@ -476,7 +476,7 @@
     let timerInterval = null;
     let isProcessing = false;
     
-    // 힌트 시스템 관련 변수
+    // 힌트 시스템 변수
     let idleSeconds = 0;
     let hintPairs = null;
 
@@ -569,7 +569,7 @@
             tile.classList.add('selected');
           }
 
-          // 힌트 타일 강조 애니메이션 적용
+          // 힌트 타일 강조 애니메이션
           if (hintPairs && hintPairs.some(p => p.r === r && p.c === c)) {
             tile.classList.add('hint-tile');
           }
@@ -603,7 +603,7 @@
       hintPairs = null;
     }
 
-    // 10초 무반응 시 바꿀 수 있는 타일쌍 탐색
+    // 15초 무반응 시 바꿀 수 있는 타일쌍 탐색
     function findAndShowHint() {
       if (hintPairs || isProcessing) return;
 
@@ -613,7 +613,7 @@
           if (c < BOARD_SIZE - 1) {
             swapTiles(r, c, r, c + 1);
             if (checkMatches().hasMatch) {
-              swapTiles(r, c, r, c + 1); // 원복
+              swapTiles(r, c, r, c + 1);
               hintPairs = [{r, c}, {r, c: c + 1}];
               document.getElementById('bannerHanzi').innerText = "💡 힌트 전달!";
               document.getElementById('bannerSub').innerText = "반짝이는 두 카드의 위치를 바꿔보세요!";
@@ -621,14 +621,14 @@
               renderBoard();
               return;
             }
-            swapTiles(r, c, r, c + 1); // 원복
+            swapTiles(r, c, r, c + 1);
           }
 
           // 아래쪽 타일과 교환 테스트
           if (r < BOARD_SIZE - 1) {
             swapTiles(r, c, r + 1, c);
             if (checkMatches().hasMatch) {
-              swapTiles(r, c, r + 1, c); // 원복
+              swapTiles(r, c, r + 1, c);
               hintPairs = [{r, c}, {r: r + 1, c}];
               document.getElementById('bannerHanzi').innerText = "💡 힌트 전달!";
               document.getElementById('bannerSub').innerText = "반짝이는 두 카드의 위치를 바꿔보세요!";
@@ -636,7 +636,7 @@
               renderBoard();
               return;
             }
-            swapTiles(r, c, r + 1, c); // 원복
+            swapTiles(r, c, r + 1, c);
           }
         }
       }
@@ -748,7 +748,7 @@
       let { hasMatch, matched } = checkMatches();
       if (!hasMatch) return false;
 
-      clearHint(); // 매칭 성공 시 힌트 타이머 초기화
+      clearHint();
       let totalMatchedCount = 0;
       let lastWord = null;
 
@@ -809,8 +809,8 @@
         idleSeconds++;
         document.getElementById('timer').innerText = `${timeLeft}s`;
 
-        // 10초 이상 유휴 상태일 때 힌트 출력
-        if (idleSeconds >= 10) {
+        // 15초 이상 유휴 상태일 때 힌트 출력
+        if (idleSeconds >= 15) {
           findAndShowHint();
         }
 
@@ -884,7 +884,7 @@
     }
 
     function closeLeaderboard() {
-      document.getElementById('leaderboardModal').classList.add('show');
+      document.getElementById('leaderboardModal').classList.remove('show');
     }
 
     function clearLeaderboard() {
