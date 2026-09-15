@@ -133,7 +133,7 @@
       font-weight: 800;
       cursor: pointer;
       transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
-      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.03), inset 0 2px 0 rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.03), inset 0 2px 0 rgba(255, 255, 255, 0.9);
       color: #2D3748;
       padding: 2px;
       text-align: center;
@@ -448,16 +448,16 @@
       ]
     };
 
-    // 명도를 96% 이상으로 올린 극연한 파스텔 톤 팔레트 (눈으로 색 구분 불가)
+    // 명도 95% 수준의 초미세 은은한 파스텔 톤 팔레트 (눈으로는 색 구분 미비함)
     const WORD_COLORS = [
-      "#FAF2F5", // 매우 연한 핑크
-      "#F2F6FA", // 매우 연한 블루
-      "#F5FAF2", // 매우 연한 그린
-      "#FAFDF2", // 매우 연한 옐로우
-      "#FAF2FD", // 매우 연한 바이올렛
-      "#FAF7F2", // 매우 연한 오렌지
-      "#F2FAF9", // 매우 연한 민트
-      "#FAF2F7"  // 매우 연한 로즈
+      "#FCF4F4", // 초미세 은은한 핑크
+      "#FCF6F0", // 초미세 은은한 베이지
+      "#FCFBF0", // 초미세 은은한 연노랑
+      "#F2FAF3", // 초미세 은은한 연두
+      "#F2FAF8", // 초미세 은은한 민트
+      "#F1F6FC", // 초미세 은은한 하늘
+      "#F7F2FC", // 초미세 은은한 라벤더
+      "#FCF2F7"  // 초미세 은은한 로즈
     ];
     
     const MASCOTS = ["🐻‍❄️", "🐰", "🐱", "🐻", "🐥", "🦊", "🦄", "🐶", "🐼"];
@@ -514,7 +514,6 @@
     }
 
     function getRandomTileInstance(allowBomb = false) {
-      // 리필 시 5% 확률로 폭탄 아이템 등장
       if (allowBomb && Math.random() < 0.05) {
         return { isBomb: true, id: -999, bg: '#FFF0F0' };
       }
@@ -590,7 +589,6 @@
 
       const clickedItem = board[r][c];
 
-      // 폭탄 블록을 직접 터치했을 때 주위 3x3 범위 폭발
       if (clickedItem && clickedItem.isBomb) {
         await triggerBombExplosion(r, c);
         return;
@@ -623,7 +621,6 @@
       }
     }
 
-    // 폭탄 폭발 로직 (주위 3x3 범위 제거)
     async function triggerBombExplosion(centerR, centerC) {
       isProcessing = true;
       selectedTile = null;
@@ -740,7 +737,7 @@
           }
         }
         for (let r = emptyRow; r >= 0; r--) {
-          board[r][c] = getRandomTileInstance(true); // 리필 시 폭탄 생성 가능
+          board[r][c] = getRandomTileInstance(true);
         }
       }
     }
